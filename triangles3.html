@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Triangle Study Guide for Martin</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #e0f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background-color: #0288d1;
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        nav {
+            margin: 20px 0;
+            text-align: center;
+            flex-wrap: wrap;
+        }
+        nav button {
+            background-color: #03a9f4;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        nav button:hover {
+            background-color: #0277bd;
+            transform: scale(1.05);
+        }
+        section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+        h2, h3 {
+            color: #0288d1;
+            border-bottom: 2px solid #0288d1;
+            padding-bottom: 5px;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        .formula {
+            background-color: #e1f5fe;
+            padding: 15px;
+            border-left: 5px solid #0288d1;
+            margin: 15px 0;
+            font-size: 1.2em;
+            border-radius: 5px;
+        }
+        .diagram {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .diagram svg {
+            max-width: 100%;
+            height: auto;
+        }
+        /* Interactive Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            color: #d32f2f;
+            text-decoration: underline dotted;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 160px;
+            background-color: #ffffff;
+            color: #000000;
+            text-align: center;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above */
+            left: 50%;
+            margin-left: -80px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* Quiz Styles */
+        .quiz-container {
+            margin-top: 20px;
+        }
+        .question {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .options li {
+            margin-bottom: 10px;
+        }
+        .options label {
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+        .next-button, .start-button, .restart-button {
+            padding: 12px 25px;
+            background-color: #0288d1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 20px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .next-button:hover, .start-button:hover, .restart-button:hover {
+            background-color: #0277bd;
+            transform: scale(1.05);
+        }
+        .result-container {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .result-container.active {
+            display: block;
+        }
+        .score {
+            font-size: 1.8em;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        /* Real-Life Applications Styles */
+        .application {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .application .app-item {
+            background-color: #e1f5fe;
+            border: 2px solid #0288d1;
+            border-radius: 10px;
+            width: 45%;
+            margin-bottom: 20px;
+            padding: 15px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .application .app-item:hover {
+            transform: scale(1.02);
+            background-color: #b3e5fc;
+        }
+        .application .app-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav button {
+                width: 80%;
+            }
+            .application .app-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Triangle Study Guide</h1>
+    </header>
+
+    <nav>
+        <button onclick="showSection('introduction')">Introduction</button>
+        <button onclick="showSection('types')">Types of Triangles</button>
+        <button onclick="showSection('properties')">Properties</button>
+        <button onclick="showSection('formulas')">Formulas</button>
+        <button onclick="showSection('theorems')">Theorems</button>
+        <button onclick="showSection('applications')">Real-Life Applications</button>
+        <button onclick="showSection('interactive')">Interactive Infographics</button>
+        <button onclick="showSection('exercises')">Practice Exercises</button>
+        <button onclick="showSection('test')">Knowledge Test</button>
+    </nav>
+
+    <!-- Introduction Section -->
+    <section id="introduction" class="active">
+        <h2>Welcome to the Triangle Study Guide!</h2>
+        <p>Hi Martin! Let's embark on an exciting journey to explore triangles. You'll learn about different types of triangles, their properties, important formulas, cool theorems, see how triangles are used in real life, interact with fun infographics, practice what you've learned, and finally test your knowledge. Ready to become a triangle master?</p>
+        <div class="diagram">
+            <!-- Simple Triangle Diagram -->
+            <svg width="300" height="260">
+                <polygon points="150,20 280,240 20,240" style="fill:#ffeb3b;stroke:#fbc02d;stroke-width:3" />
+                <text x="145" y="15" fill="#000000" font-size="16">Triangle</text>
+                <line x1="150" y1="20" x2="280" y2="240" style="stroke:#000000;stroke-width:2" />
+                <line x1="150" y1="20" x2="20" y2="240" style="stroke:#000000;stroke-width:2" />
+                <line x1="20" y1="240" x2="280" y2="240" style="stroke:#000000;stroke-width:2" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Types of Triangles Section -->
+    <section id="types">
+        <h2>Types of Triangles</h2>
+        <p>Triangles can be classified based on their sides and angles. Let's explore the different types!</p>
+        <h3>Based on Sides:</h3>
+        <ul>
+            <li><strong>Equilateral Triangle:</strong> All three sides are equal.</li>
+            <li><strong>Isosceles Triangle:</strong> Two sides are equal.</li>
+            <li><strong>Scalene Triangle:</strong> All sides are different.</li>
+        </ul>
+        <h3>Based on Angles:</h3>
+        <ul>
+            <li><strong>Acute Triangle:</strong> All angles are less than 90°.</li>
+            <li><strong>Right Triangle:</strong> One angle is exactly 90°.</li>
+            <li><strong>Obtuse Triangle:</strong> One angle is greater than 90°.</li>
+        </ul>
+        <div class="diagram">
+            <!-- Types of Triangles Diagram -->
+            <svg width="600" height="400">
+                <!-- Equilateral -->
+                <polygon points="100,50 150,150 50,150" style="fill:#a5d6a7;stroke:#388e3c;stroke-width:2" />
+                <text x="80" y="140" fill="#000" font-size="14">Equilateral</text>
+                <!-- Isosceles -->
+                <polygon points="250,50 300,150 200,150" style="fill:#90caf9;stroke:#1976d2;stroke-width:2" />
+                <text x="230" y="140" fill="#000" font-size="14">Isosceles</text>
+                <!-- Scalene -->
+                <polygon points="400,50 470,150 330,150" style="fill:#f48fb1;stroke:#c2185b;stroke-width:2" />
+                <text x="380" y="140" fill="#000" font-size="14">Scalene</text>
+                <!-- Acute -->
+                <polygon points="100,200 150,300 50,300" style="fill:#ffe082;stroke:#ffa000;stroke-width:2" />
+                <text x="80" y="290" fill="#000" font-size="14">Acute</text>
+                <!-- Right -->
+                <polygon points="250,200 300,300 200,300" style="fill:#ce93d8;stroke:#6a1b9a;stroke-width:2" />
+                <text x="230" y="290" fill="#000" font-size="14">Right</text>
+                <!-- Obtuse -->
+                <polygon points="400,200 470,300 330,300" style="fill:#ffab91;stroke:#e64a19;stroke-width:2" />
+                <text x="380" y="290" fill="#000" font-size="14">Obtuse</text>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Properties Section -->
+    <section id="properties">
+        <h2>Properties of Triangles</h2>
+        <p>Triangles have some fascinating properties that help us understand their shapes and sizes better.</p>
+        <ul>
+            <li><strong>Sum of Angles:</strong> The sum of all internal angles in a triangle is always 180°.</li>
+            <li><strong>Exterior Angle:</strong> An exterior angle is equal to the sum of the two opposite internal angles.</li>
+            <li><strong>Pythagorean Theorem:</strong> In a right triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides.</li>
+            <li><strong>Area:</strong> The area of a triangle can be calculated using various formulas (we'll cover them in the formulas section).</li>
+            <li><strong>Perimeter:</strong> The perimeter is the sum of all three sides.</li>
+        </ul>
+        <div class="formula">
+            <strong>Pythagorean Theorem:</strong> c² = a² + b²
+        </div>
+        <div class="diagram">
+            <!-- Triangle Properties Diagram with Interactive Parts -->
+            <svg width="300" height="260" id="properties-diagram">
+                <polygon points="150,20 280,240 20,240" style="fill:#ffccbc;stroke:#d84315;stroke-width:2" />
+                <line x1="150" y1="20" x2="280" y2="240" style="stroke:#000000;stroke-width:2" />
+                <line x1="150" y1="20" x2="20" y2="240" style="stroke:#000000;stroke-width:2" />
+                <line x1="20" y1="240" x2="280" y2="240" style="stroke:#000000;stroke-width:2" />
+                <!-- Labels with Tooltips -->
+                <circle cx="150" cy="20" r="8" fill="#0000ff" class="tooltip-element">
+                    <title>Angle at C: 90° (Right Angle)</title>
+                </circle>
+                <circle cx="280" cy="240" r="8" fill="#0000ff" class="tooltip-element">
+                    <title>Angle at A</title>
+                </circle>
+                <circle cx="20" cy="240" r="8" fill="#0000ff" class="tooltip-element">
+                    <title>Angle at B</title>
+                </circle>
+                <!-- Angle Labels -->
+                <text x="150" y="15" fill="#000" font-size="14">C</text>
+                <text x="275" y="245" fill="#000" font-size="14">A</text>
+                <text x="15" y="245" fill="#000" font-size="14">B</text>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Formulas Section -->
+    <section id="formulas">
+        <h2>Important Formulas</h2>
+        <p>Here are some important formulas related to triangles that will help you solve various problems.</p>
+        <h3>Perimeter</h3>
+        <div class="formula">
+            <strong>Perimeter (P):</strong> P = a + b + c
+        </div>
+        <h3>Area</h3>
+        <div class="formula">
+            <strong>Area (A):</strong> A = (base × height) / 2
+        </div>
+        <h3>Pythagorean Theorem</h3>
+        <div class="formula">
+            <strong>Pythagorean Theorem:</strong> c² = a² + b²
+        </div>
+        <div class="diagram">
+            <!-- Pythagorean Theorem Diagram -->
+            <svg width="300" height="260">
+                <polygon points="50,220 50,60 200,60" style="fill:#c5cae9;stroke:#3f51b5;stroke-width:2" />
+                <polygon points="50,220 200,220 200,60" style="fill:#9fa8da;stroke:#3f51b5;stroke-width:2" />
+                <polygon points="50,220 200,220 125,135" style="fill:#7986cb;stroke:#3f51b5;stroke-width:2" />
+                <!-- Labels -->
+                <text x="45" y="225" fill="#000" font-size="14">A</text>
+                <text x="205" y="225" fill="#000" font-size="14">B</text>
+                <text x="205" y="55" fill="#000" font-size="14">C</text>
+                <!-- Right Angle Indicator -->
+                <line x1="50" y1="60" x2="50" y2="65" style="stroke:#000000;stroke-width:2" />
+                <line x1="50" y1="60" x2="55" y2="60" style="stroke:#000000;stroke-width:2" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Theorems Section -->
+    <section id="theorems">
+        <h2>Theorems</h2>
+        <p>Understanding theorems helps in solving complex problems related to triangles.</p>
+        <h3>Pythagorean Theorem</h3>
+        <p>In a right triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides.</p>
+        <div class="formula">
+            <strong>c² = a² + b²</strong>
+        </div>
+        <div class="diagram">
+            <!-- Pythagorean Theorem Interactive Diagram -->
+            <svg width="300" height="260" id="pythagorean-diagram">
+                <polygon points="150,20 280,240 20,240" style="fill:#c8e6c9;stroke:#2e7d32;stroke-width:2" />
+                <line x1="150" y1="20" x2="280" y2="240" style="stroke:#000000;stroke-width:2" />
+                <line x1="150" y1="20" x2="20" y2="240" style="stroke:#000000;stroke-width:2" />
+                <line x1="20" y1="240" x2="280" y2="240" style="stroke:#000000;stroke-width:2" />
+                <!-- Labels -->
+                <text x="150" y="15" fill="#000" font-size="14">C</text>
+                <text x="275" y="245" fill="#000" font-size="14">A</text>
+                <text x="15" y="245" fill="#000" font-size="14">B</text>
+                <!-- Right Angle Indicator -->
+                <line x1="150" y1="20" x2="150" y2="25" style="stroke:#000000;stroke-width:2" />
+                <line x1="150" y1="20" x2="155" y2="20" style="stroke:#000000;stroke-width:2" />
+                <text x="160" y="30" fill="#000" font-size="12">90°</text>
+            </svg>
+        </div>
+        <h3>Triangle Sum Theorem</h3>
+        <p>The sum of the internal angles of a triangle is always 180°.</p>
+        <div class="diagram">
+            <!-- Triangle Sum Theorem Diagram -->
+            <svg width="300" height="260">
+                <polygon points="150,20 280,240 20,240" style="fill:#ffcdd2;stroke:#c62828;stroke-width:2" />
+                <line x1="150" y1="20" x2="280" y2="240" style="stroke:#000000;stroke-width:2" />
+                <line x1="150" y1="20" x2="20" y2="240" style="stroke:#000000;stroke-width:2" />
+                <line x1="20" y1="240" x2="280" y2="240" style="stroke:#000000;stroke-width:2" />
+                <!-- Angle Indicators -->
+                <path d="M150,20 A15,15 0 0,1 165,35" style="fill:none;stroke:#000000;stroke-width:2" />
+                <text x="170" y="35" fill="#000" font-size="12">α</text>
+                <path d="M280,240 A15,15 0 0,1 265,225" style="fill:none;stroke:#000000;stroke-width:2" />
+                <text x="250" y="220" fill="#000" font-size="12">β</text>
+                <path d="M20,240 A15,15 0 0,1 35,225" style="fill:none;stroke:#000000;stroke-width:2" />
+                <text x="45" y="220" fill="#000" font-size="12">γ</text>
+                <text x="130" y="150" fill="#000" font-size="14">α + β + γ = 180°</text>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Real-Life Applications Section -->
+    <section id="applications">
+        <h2>Real-Life Applications</h2>
+        <p>Triangles are everywhere around us! Let's see how they are used in real life.</p>
+        <div class="application">
+            <div class="app-item">
+                <h3>Architecture</h3>
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxzdHlsZT4uY2FjaGUgeyBmaWxsOiMwMDI4ZDExOyBzdHJva2U6I2ZmZjA3MDsiIH0uY29tcG9uZW50IHsgZmlsbDojZjhjYWM5ZjsgfTwvc3R5bGU+Cjxwb2x5Z29uIGNsYXNzPSJjYWNlIiBwb2ludHM9IjIwMCw1MCAxODAsMTUwIDIwMCwxNTAgMjAwLDUwIiAvPgo8L3N2Zz4=" alt="Architecture Diagram">
+                <p>Triangles provide stability to structures like bridges and buildings.</p>
+            </div>
+            <div class="app-item">
+                <h3>Art and Design</h3>
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxzdHlsZT4uY2FjaGUgeyBmaWxsOiMwMDI4ZDExOyBzdHJva2U6I2ZmZjA3MDsiIH0uY29tcG9uZW50IHsgZmlsbDojZmZjYWI5OyBzdHJva2U6I2ZmZmZmZjsgc3Ryb2tlLXdpZHRoOjI7IH0uZWNob2NzdXJlIHsgZmlsbDojZDA4OGQxMTsgfTwvc3R5bGU+Cjxwb2x5Z29uIGNsYXNzPSJjYWNlIiBwb2ludHM9IjUwLDEwMCAyNSwxNTAgNTAsMTUwIDUwLDEwMCIgLz4KPHBvbHlnb24gY2xhc3M9ImNoaWNvbHN1cmUiIHBvaW50cz0iMjUwLDEwMCAyNTAsMTUwIDI1MCwxMDAiIC8+Cjwvc3ZnPg==" alt="Art and Design Diagram">
+                <p>Artists use triangles to create patterns and enhance designs.</p>
+            </div>
+            <div class="app-item">
+                <h3>Navigation</h3>
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxzdHlsZT4uY2FjaGUgeyBmaWxsOiMwMDI4ZDExOyBzdHJva2U6I2ZmZjA3MDsiIH0uY29tcG9uZW50IHsgZmlsbDojZmZjYWI5OyBzdHJva2U6I2ZmZjBmZjsgc3Ryb2tlLXdpZHRoOjI7IH0ubmF2aWdhdGlvbiB7IGZpbGw6I2UwZThiMDsiIH0uY29tcG9uZW50IHsgZmlsbDojMDI4OGQxMTsgfTwvc3R5bGU+Cjxwb2x5Z29uIGNsYXNzPSJjYWNlIiBwb2ludHM9IjEwMCwxMDAgMjUwLDE1MCAyOTAsMTAwIDQwMCwxMDAiIC8+Cjx0ZXh0IHg9IjE1MCIgeT0i195IIGZpbGw9IiMwMDI4ZDExIiBmb250LXNpemU9IjE0Ij5OYXZpZ2F0aW9uPC90ZXh0Pgo8L3N2Zz4=" alt="Navigation Diagram">
+                <p>Triangulation helps in determining precise locations.</p>
+            </div>
+            <div class="app-item">
+                <h3>Sports</h3>
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxzdHlsZT4uY2FjaGUgeyBmaWxsOiMwMDI4ZDExOyBzdHJva2U6I2ZmZmZmZjsgc3Ryb2tlLXdpZHRoOjI7IH0uY29tcG9uZW50IHsgZmlsbDojZmZjYWI5OyB9PC9zdHlsZT4KPHBvbHlnb24gY2xhc3M9ImNhY2UiIHBvaW50cz0iMTUwLDEwMCAyMzAsMTUwIDE1MCwxOTAgMTAwLDE5MCIgLz4KPHBvbHlnb24gY2xhc3M9ImdyZWVuIiBwb2ludHM9IjE1MCwxNTAgMjMwLDE1MCAxNTAsMTkwIDMwMCwxOTAiIC8+Cjwvc3ZnPg==" alt="Sports Diagram">
+                <p>Triangles are used in the design of sports equipment and strategies.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Infographics Section -->
+    <section id="interactive">
+        <h2>Interactive Infographics</h2>
+        <p>Explore these interactive diagrams to deepen your understanding of triangles!</p>
+        <div class="diagram">
+            <!-- Interactive Triangle Angle Sum -->
+            <svg width="400" height="300" id="interactive-triangle" style="border:1px solid #ccc; border-radius:5px;">
+                <polygon points="200,50 350,250 50,250" style="fill:#ffe0b2;stroke:#ff6f00;stroke-width:2" />
+                <!-- Labels -->
+                <circle cx="200" cy="50" r="10" fill="#d84315" class="tooltip-element">
+                    <title>Angle at Vertex C: 90° (Right Angle)</title>
+                </circle>
+                <circle cx="350" cy="250" r="10" fill="#d84315" class="tooltip-element">
+                    <title>Angle at Vertex A</title>
+                </circle>
+                <circle cx="50" cy="250" r="10" fill="#d84315" class="tooltip-element">
+                    <title>Angle at Vertex B</title>
+                </circle>
+                <!-- Angle Labels -->
+                <text x="190" y="45" fill="#000" font-size="14">C</text>
+                <text x="340" y="245" fill="#000" font-size="14">A</text>
+                <text x="35" y="245" fill="#000" font-size="14">B</text>
+                <text x="180" y="180" fill="#000" font-size="14">180°</text>
+                <!-- Sum of Angles Indicator -->
+                <path d="M200,50 L350,250 L50,250 Z" style="fill:none;stroke:#000;stroke-width:1;stroke-dasharray:5,5" />
+            </svg>
+            <p>Hover over the points labeled A, B, or C to see more information about each angle.</p>
+        </div>
+    </section>
+
+    <!-- Practice Exercises Section -->
+    <section id="exercises">
+        <h2>Practice Exercises</h2>
+        <p>Try these exercises to apply what you've learned about triangles.</p>
+        <ol>
+            <li>
+                <strong>Exercise 1:</strong> Identify the type of triangle with sides of lengths 5 cm, 5 cm, and 5 cm.
+                <div class="diagram">
+                    <!-- Equilateral Triangle -->
+                    <svg width="150" height="130">
+                        <polygon points="75,10 140,120 10,120" style="fill:#c8e6c9;stroke:#2e7d32;stroke-width:2" />
+                        <text x="70" y="135" fill="#000" font-size="14">Equilateral</text>
+                    </svg>
+                </div>
+            </li>
+            <li>
+                <strong>Exercise 2:</strong> Calculate the perimeter of a triangle with sides 7 cm, 9 cm, and 12 cm.
+                <div class="formula">
+                    P = a + b + c = 7 + 9 + 12 = <strong>28 cm</strong>
+                </div>
+            </li>
+            <li>
+                <strong>Exercise 3:</strong> Find the area of a triangle with a base of 10 cm and a height of 6 cm.
+                <div class="formula">
+                    A = (base × height) / 2 = (10 × 6) / 2 = <strong>30 cm²</strong>
+                </div>
+            </li>
+            <li>
+                <strong>Exercise 4:</strong> In a right triangle, if one side is 8 cm and the other side is 6 cm, find the hypotenuse using the Pythagorean Theorem.
+                <div class="formula">
+                    c² = a² + b² = 8² + 6² = 64 + 36 = 100<br>
+                    c = √100 = <strong>10 cm</strong>
+                </div>
+            </li>
+            <li>
+                <strong>Exercise 5:</strong> Identify the type of triangle with angles 60°, 60°, and 60°.
+                <div class="diagram">
+                    <!-- Acute Triangle -->
+                    <svg width="150" height="130">
+                        <polygon points="75,10 140,120 10,120" style="fill:#bbdefb;stroke:#1e88e5;stroke-width:2" />
+                        <text x="70" y="135" fill="#000" font-size="14">Equilateral</text>
+                    </svg>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <!-- Knowledge Test Section -->
+    <section id="test">
+        <h2>Knowledge Test</h2>
+        <p>Answer the following questions to see how much you've learned about triangles!</p>
+        <div class="quiz-container">
+            <div class="question-container">
+                <div class="question">1. What is the sum of all internal angles in a triangle?</div>
+                <ul class="options">
+                    <li><label><input type="radio" name="q1" value="90°"> 90°</label></li>
+                    <li><label><input type="radio" name="q1" value="180°"> 180°</label></li>
+                    <li><label><input type="radio" name="q1" value="270°"> 270°</label></li>
+                    <li><label><input type="radio" name="q1" value="360°"> 360°</label></li>
+                </ul>
+            </div>
+            <div class="question-container">
+                <div class="question">2. Which type of triangle has all sides equal?</div>
+                <ul class="options">
+                    <li><label><input type="radio" name="q2" value="Isosceles Triangle"> Isosceles Triangle</label></li>
+                    <li><label><input type="radio" name="q2" value="Scalene Triangle"> Scalene Triangle</label></li>
+                    <li><label><input type="radio" name="q2" value="Equilateral Triangle"> Equilateral Triangle</label></li>
+                    <li><label><input type="radio" name="q2" value="Right Triangle"> Right Triangle</label></li>
+                </ul>
+            </div>
+            <div class="question-container">
+                <div class="question">3. In a right triangle, which theorem relates the sides?</div>
+                <ul class="options">
+                    <li><label><input type="radio" name="q3" value="Pythagorean Theorem"> Pythagorean Theorem</label></li>
+                    <li><label><input type="radio" name="q3" value="Area Theorem"> Area Theorem</label></li>
+                    <li><label><input type="radio" name="q3" value="Sum Theorem"> Sum Theorem</label></li>
+                    <li><label><input type="radio" name="q3" value="Difference Theorem"> Difference Theorem</label></li>
+                </ul>
+            </div>
+            <div class="question-container">
+                <div class="question">4. What is the area of a triangle with a base of 8 cm and a height of 5 cm?</div>
+                <ul class="options">
+                    <li><label><input type="radio" name="q4" value="20 cm²"> 20 cm²</label></li>
+                    <li><label><input type="radio" name="q4" value="30 cm²"> 30 cm²</label></li>
+                    <li><label><input type="radio" name="q4" value="40 cm²"> 40 cm²</label></li>
+                    <li><label><input type="radio" name="q4" value="50 cm²"> 50 cm²</label></li>
+                </ul>
+            </div>
+            <div class="question-container">
+                <div class="question">5. Which type of triangle has one angle greater than 90°?</div>
+                <ul class="options">
+                    <li><label><input type="radio" name="q5" value="Acute Triangle"> Acute Triangle</label></li>
+                    <li><label><input type="radio" name="q5" value="Obtuse Triangle"> Obtuse Triangle</label></li>
+                    <li><label><input type="radio" name="q5" value="Right Triangle"> Right Triangle</label></li>
+                    <li><label><input type="radio" name="q5" value="Equilateral Triangle"> Equilateral Triangle</label></li>
+                </ul>
+            </div>
+            <button class="next-button">Check Answers</button>
+        </div>
+        <div class="result-container">
+            <h3>Your Score: <span class="score"></span> / 5</h3>
+            <button class="restart-button" onclick="restartQuiz()">Try Again</button>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // Navigation Function
+    function showSection(id) {
+        const sections = document.querySelectorAll('section');
+        sections.forEach(section => {
+            if(section.id === id){
+                section.classList.add('active');
+            } else {
+                section.classList.remove('active');
+            }
+        });
+        window.scrollTo(0, 0);
+    }
+
+    // Quiz Logic
+    const quizContainer = document.querySelector('.quiz-container');
+    const nextButton = document.querySelector('.next-button');
+    const resultContainer = document.querySelector('.result-container');
+    const scoreSpan = document.querySelector('.score');
+
+    nextButton.addEventListener('click', () => {
+        // Define correct answers
+        const answers = {
+            q1: '180°',
+            q2: 'Equilateral Triangle',
+            q3: 'Pythagorean Theorem',
+            q4: '20 cm²',
+            q5: 'Obtuse Triangle'
+        };
+        let correct = 0;
+        for(let i=1; i<=5; i++){
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if(selected && selected.value === answers[`q${i}`]){
+                correct++;
+            }
+        }
+        // Display Result
+        quizContainer.style.display = 'none';
+        resultContainer.classList.add('active');
+        scoreSpan.textContent = correct;
+    });
+
+    function restartQuiz(){
+        // Reset quiz
+        const inputs = document.querySelectorAll('input[type="radio"]');
+        inputs.forEach(input => input.checked = false);
+        quizContainer.style.display = 'block';
+        resultContainer.classList.remove('active');
+        window.scrollTo(0, 0);
+    }
+
+    // Interactive Diagram Handling (if needed)
+    // Currently handled by <title> in SVGs for simplicity
+</script>
+
+</body>
+</html>
