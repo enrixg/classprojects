@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta Tags and Title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Study Guide - Prozentrechnung & Zinsen</title>
+    <!-- Stylesheets and Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js" crossorigin></script>
+    <script src="https://cdn.plot.ly/plotly-2.9.0.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        nav {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        nav button {
+            margin: 5px;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        nav button:hover {
+            background-color: #0056b3;
+        }
+        .tab-content {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #007bff;
+        }
+        h3 {
+            color: #0056b3;
+        }
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #e9f5ff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
+        }
+        .question button {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .question button:hover {
+            background-color: #218838;
+        }
+        .question p {
+            font-size: 18px;
+        }
+        .explanation {
+            background-color: #d4edda;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 10px;
+            color: #155724;
+        }
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
+        /* Chart Styles */
+        #prozent-chart, #interest-chart {
+            margin-top: 30px;
+        }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav button {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+            .question p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        class App extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    currentTab: 'prozentrechnung',
+                };
+            }
+
+            changeTab = (tab) => {
+                this.setState({ currentTab: tab });
+            }
+
+            render() {
+                return (
+                    <div className="container">
+                        <header>
+                            <h1>Interactive Study Guide<br />Interaktiver Studienführer</h1>
+                            <nav>
+                                <button onClick={() => this.changeTab('prozentrechnung')}>Prozentrechnung</button>
+                                <button onClick={() => this.changeTab('zinsen')}>Zinsen</button>
+                                <button onClick={() => this.changeTab('test')}>Knowledge Test</button>
+                            </nav>
+                        </header>
+                        {this.state.currentTab === 'prozentrechnung' && <Prozentrechnung />}
+                        {this.state.currentTab === 'zinsen' && <Zinsen />}
+                        {this.state.currentTab === 'test' && <KnowledgeTest />}
+                    </div>
+                );
+            }
+        }
+
+        class Prozentrechnung extends React.Component {
+            componentDidMount() {
+                this.renderProzentChart();
+            }
+
+            renderProzentChart() {
+                const data = [{
+                    values: [60, 40],
+                    labels: ['Prozentwert (Percentage Value)', 'Restwert (Remaining Value)'],
+                    type: 'pie',
+                    marker: {
+                        colors: ['#007bff', '#cccccc']
+                    }
+                }];
+
+                const layout = {
+                    title: 'Anteil eines Ganzen<br />Portion of a Whole',
+                };
+
+                Plotly.newPlot('prozent-chart', data, layout);
+            }
+
+            render() {
+                return (
+                    <div className="tab-content">
+                        <h2>Prozentrechnung<br />Percentage Calculations</h2>
+                        <p>
+                            Die Prozentrechnung ist ein fundamentales mathematisches Werkzeug, das in vielen realen Situationen Anwendung findet.
+                            <br />
+                            Percentage calculations are a fundamental mathematical tool used in many real-world situations.
+                        </p>
+
+                        <h3>Schlüsselbegriffe<br />Key Terms</h3>
+                        <ul>
+                            <li><strong>Grundwert (G) - Base Value:</strong> Gesamter Wert oder Ausgangswert.<br />Total amount or original value.</li>
+                            <li><strong>Prozentwert (W) - Percentage Value:</strong> Der Teil des Grundwerts.<br />The part of the base value.</li>
+                            <li><strong>Prozentsatz (p%) - Percentage Rate:</strong> Verhältnis des Prozentwerts zum Grundwert in Prozent.<br />Ratio of the percentage value to the base value, expressed as a percentage.</li>
+                        </ul>
+
+                        <h3>Umrechnung zwischen Werten und Prozenten<br />Converting Values and Percentages</h3>
+                        <p>
+                            Um einen Wert in Prozent umzuwandeln: <strong>(Wert / Grundwert) * 100 = Prozentsatz</strong><br />
+                            To convert a value to a percentage: <strong>(Value / Base Value) * 100 = Percentage Rate</strong>
+                        </p>
+                        <p>
+                            Um einen Prozentsatz in einen Wert umzuwandeln: <strong>(Prozentsatz / 100) * Grundwert = Wert</strong><br />
+                            To convert a percentage to a value: <strong>(Percentage Rate / 100) * Base Value = Value</strong>
+                        </p>
+
+                        <h3>Verschiedene Methoden der Prozentrechnung<br />Different Methods for Percentage Calculations</h3>
+                        <ol>
+                            <li><strong>Prozentstreifen - Percentage Bars:</strong> Visuelle Darstellung von Prozenten.<br />Visual representation of percentages.</li>
+                            <li><strong>Minitabellen - Mini Tables:</strong> Organisierte Darstellung der Beziehungen zwischen Werten.<br />Organized way to show relationships between values.</li>
+                            <li><strong>Formeln - Formulas:</strong> Mathematische Gleichungen für genaue Berechnungen.<br />Mathematical equations for precise calculations.</li>
+                        </ol>
+
+                        <h3>Sprachliche Feinheiten in Prozentaufgaben<br />Language Nuances in Percentage Problems</h3>
+                        <table>
+                            <tr>
+                                <th>Phrase</th>
+                                <th>Bedeutung<br />Meaning</th>
+                            </tr>
+                            <tr>
+                                <td>Herabgesetzt um 20%<br />Reduced by 20%</td>
+                                <td>Preis wird um 20% reduziert.<br />Price is reduced by 20%.</td>
+                            </tr>
+                            <tr>
+                                <td>Reduziert auf 80%<br />Reduced to 80%</td>
+                                <td>Neuer Preis ist 80% des ursprünglichen Preises.<br />New price is 80% of the original price.</td>
+                            </tr>
+                            <tr>
+                                <td>Rabatt von 20%<br />20% Discount</td>
+                                <td>Endpreis ist 80% des Ausgangspreises.<br />Final price is 80% of the initial price.</td>
+                            </tr>
+                            <tr>
+                                <td>Sparen von 20%<br />Saving 20%</td>
+                                <td>Man spart 20% des ursprünglichen Preises.<br />You save 20% of the original price.</td>
+                            </tr>
+                        </table>
+
+                        <h3>Praktische Beispiele<br />Practical Examples</h3>
+                        <p>
+                            Beispiel: Ein Kleid kostet ursprünglich €100 und wird um 15% reduziert. Was ist der neue Preis?<br />
+                            Example: A dress originally costs €100 and is reduced by 15%. What is the new price?
+                        </p>
+                        <p>
+                            Lösung:<br />
+                            Solution:
+                        </p>
+                        <ul>
+                            <li>Reduktion: (15/100) * €100 = €15</li>
+                            <li>Neuer Preis: €100 - €15 = €85</li>
+                        </ul>
+
+                        <div id="prozent-chart"></div>
+                    </div>
+                );
+            }
+        }
+
+        class Zinsen extends React.Component {
+            componentDidMount() {
+                this.renderInterestChart();
+            }
+
+            renderInterestChart() {
+                const data = {
+                    x: [0, 1, 2, 3, 4, 5],
+                    y: [1000, 1050, 1102.5, 1157.63, 1215.51, 1276.28],
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    marker: { color: '#28a745' }
+                };
+
+                const layout = {
+                    title: 'Zinseszinsentwicklung über 5 Jahre<br />Compound Interest Growth over 5 Years',
+                    xaxis: { title: 'Jahre<br />Years' },
+                    yaxis: { title: 'Betrag (€)<br />Amount (€)' }
+                };
+
+                Plotly.newPlot('interest-chart', [data], layout);
+            }
+
+            render() {
+                return (
+                    <div className="tab-content">
+                        <h2>Zinsen<br />Interest Rates</h2>
+                        <p>
+                            Zinsrechnung ist wichtig für das Verständnis von Investitionen und Darlehen.<br />
+                            Calculating interest is important for understanding investments and loans.
+                        </p>
+
+                        <h3>Schlüsselbegriffe<br />Key Terms</h3>
+                        <ul>
+                            <li><strong>Kapital (K) - Capital:</strong> Anfangsbetrag des Geldes.<br />Initial amount of money.</li>
+                            <li><strong>Zinsen (Z) - Interest:</strong> Betrag, der für die Nutzung von Geld gezahlt oder verdient wird.<br />Amount paid or earned for the use of money.</li>
+                            <li><strong>Zinssatz (p%) - Interest Rate:</strong> Prozentsatz des Kapitals, der als Zinsen berechnet wird.<br />Percentage of the capital charged as interest.</li>
+                        </ul>
+
+                        <h3>Formeln für die Zinsrechnung<br />Interest Calculation Formulas</h3>
+                        <p>
+                            Einfache Zinsen:<br />
+                            Simple Interest:
+                        </p>
+                        <p><strong>Z = (K * p * t) / 100</strong></p>
+                        <p>
+                            Z = Zinsen<br />Z = Interest<br />
+                            K = Kapital<br />K = Capital<br />
+                            p = Zinssatz<br />p = Interest Rate<br />
+                            t = Zeit in Jahren<br />t = Time in years
+                        </p>
+
+                        <p>
+                            Zinseszinsen:<br />
+                            Compound Interest:
+                        </p>
+                        <p><strong>Kₙ = K₀ * (1 + p/100)ⁿ</strong></p>
+                        <p>
+                            Kₙ = Endkapital nach n Jahren<br />Kₙ = Final capital after n years<br />
+                            K₀ = Anfangskapital<br />K₀ = Initial capital<br />
+                            n = Anzahl der Jahre<br />n = Number of years
+                        </p>
+
+                        <h3>Beispiel<br />Example</h3>
+                        <p>
+                            Wenn Sie €1.000 mit einem Zinssatz von 5% pro Jahr für 3 Jahre anlegen, wie viel Geld haben Sie dann?<br />
+                            If you invest €1,000 at an interest rate of 5% per year for 3 years, how much money will you have?
+                        </p>
+                        <p>
+                            Lösung mit Zinseszins:<br />
+                            Solution using compound interest:
+                        </p>
+                        <ul>
+                            <li>K₃ = €1.000 * (1 + 5/100)³</li>
+                            <li>K₃ = €1.000 * (1.157625)</li>
+                            <li>K₃ = €1.157,63</li>
+                        </ul>
+
+                        <div id="interest-chart"></div>
+                    </div>
+                );
+            }
+        }
+
+        class KnowledgeTest extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    questions: [
+                        {
+                            question: "1. Was ist 25% von 80?<br />What is 25% of 80?",
+                            options: ["A) 15", "B) 20", "C) 25"],
+                            correctAnswer: "B",
+                            explanation: "25% von 80 ist (25/100)*80 = 20.<br />25% of 80 is (25/100)*80 = 20."
+                        },
+                        {
+                            question: "2. Wenn ein Artikel um 30% reduziert wird, wie viel Prozent des ursprünglichen Preises zahlen Sie?<br />If an item is reduced by 30%, what percentage of the original price do you pay?",
+                            options: ["A) 70%", "B) 30%", "C) 100%"],
+                            correctAnswer: "A",
+                            explanation: "Sie zahlen 100% - 30% = 70% des ursprünglichen Preises.<br />You pay 100% - 30% = 70% of the original price."
+                        },
+                        {
+                            question: "3. Was ist 150% von 40?<br />What is 150% of 40?",
+                            options: ["A) 50", "B) 60", "C) 70"],
+                            correctAnswer: "B",
+                            explanation: "150% von 40 ist (150/100)*40 = 60.<br />150% of 40 is (150/100)*40 = 60."
+                        },
+                        {
+                            question: "4. Wenn 15 60% einer Zahl ist, was ist die Zahl?<br />If 15 is 60% of a number, what is the number?",
+                            options: ["A) 20", "B) 25", "C) 30"],
+                            correctAnswer: "B",
+                            explanation: "Die Zahl ist 15 / 0,6 = 25.<br />The number is 15 / 0.6 = 25."
+                        },
+                        {
+                            question: "5. Ein Hemd kostet ursprünglich €50 und wird auf €40 reduziert. Wie hoch ist der prozentuale Rabatt?<br />A shirt originally priced at €50 is reduced to €40. What is the percentage discount?",
+                            options: ["A) 10%", "B) 20%", "C) 25%"],
+                            correctAnswer: "B",
+                            explanation: "Rabatt ist (€50 - €40)/€50 * 100% = 20%.<br />Discount is (€50 - €40)/€50 * 100% = 20%."
+                        },
+                        {
+                            question: "6. Was sind €1000 zu 5% Zinsen für 3 Jahre?<br />What is €1000 at 5% interest for 3 years?",
+                            options: ["A) €150", "B) €100", "C) €50"],
+                            correctAnswer: "A",
+                            explanation: "Zinsen = €1000 * 5% * 3 = €150.<br />Interest = €1000 * 5% * 3 = €150."
+                        },
+                        {
+                            question: "7. Was ist 33,33% als Bruch in der einfachsten Form?<br />What is 33.33% as a fraction in simplest form?",
+                            options: ["A) 1/3", "B) 2/5", "C) 1/4"],
+                            correctAnswer: "A",
+                            explanation: "33,33% = 33,33/100 ≈ 1/3.<br />33.33% = 33.33/100 ≈ 1/3."
+                        },
+                        {
+                            question: "8. Wenn eine Population von 1000 auf 1200 wächst, was ist die prozentuale Zunahme?<br />If a population grows from 1000 to 1200, what is the percentage increase?",
+                            options: ["A) 15%", "B) 20%", "C) 25%"],
+                            correctAnswer: "B",
+                            explanation: "Zunahme = (1200-1000)/1000 * 100% = 20%.<br />Increase = (1200-1000)/1000 * 100% = 20%."
+                        },
+                        {
+                            question: "9. Was ist 0,75 als Prozentsatz?<br />What is 0.75 as a percentage?",
+                            options: ["A) 75%", "B) 7.5%", "C) 0.75%"],
+                            correctAnswer: "A",
+                            explanation: "0,75 * 100% = 75%.<br />0.75 * 100% = 75%."
+                        },
+                        {
+                            question: "10. Was ist der Gesamtbetrag nach 2 Jahren bei €1000 zu 8% Zinsen p.a.?<br />What is the total amount after 2 years on €1000 at 8% p.a. interest?",
+                            options: ["A) €1.166,40", "B) €1.160,00", "C) €1.172,00"],
+                            correctAnswer: "A",
+                            explanation: "Betrag = €1000 * (1+0,08)^2 = €1.166,40.<br />Amount = €1000 * (1+0.08)^2 = €1,166.40."
+                        },
+                        {
+                            question: "11. Was ist 20% von 20% von 100?<br />What is 20% of 20% of 100?",
+                            options: ["A) 4", "B) 2", "C) 20"],
+                            correctAnswer: "A",
+                            explanation: "Ergebnis = 0,2 * 0,2 * 100 = 4.<br />Result = 0.2 * 0.2 * 100 = 4."
+                        },
+                        {
+                            question: "12. Wenn der Preis um 20% steigt und dann um 20% sinkt, ist der Endpreis...<br />If the price increases by 20% and then decreases by 20%, the final price is...",
+                            options: ["A) Gleich", "B) Höher", "C) Niedriger"],
+                            correctAnswer: "C",
+                            explanation: "Endpreis = 100 * 1,2 * 0,8 = 96.<br />Final price = 100 * 1.2 * 0.8 = 96."
+                        },
+                        {
+                            question: "13. Was ist der Zinssatz, wenn €1000 in 3 Jahren €150 Zinsen bringt?<br />What is the interest rate if €1000 earns €150 interest in 3 years?",
+                            options: ["A) 4%", "B) 5%", "C) 6%"],
+                            correctAnswer: "B",
+                            explanation: "Zinssatz = (€150 / (€1000 * 3)) * 100% = 5%.<br />Interest rate = (€150 / (€1000 * 3)) * 100% = 5%."
+                        },
+                        {
+                            question: "14. Wenn 80% einer Zahl 64 sind, was ist die Zahl?<br />If 80% of a number is 64, what is the number?",
+                            options: ["A) 80", "B) 70", "C) 90"],
+                            correctAnswer: "A",
+                            explanation: "Zahl = 64 / 0,8 = 80.<br />Number = 64 / 0.8 = 80."
+                        },
+                        {
+                            question: "15. Was ist die prozentuale Zunahme von 50 auf 75?<br />What is the percentage increase from 50 to 75?",
+                            options: ["A) 50%", "B) 25%", "C) 75%"],
+                            correctAnswer: "A",
+                            explanation: "Zunahme = (75-50)/50 * 100% = 50%.<br />Increase = (75-50)/50 * 100% = 50%."
+                        },
+                        {
+                            question: "16. Was ist 1/8 als Prozentsatz?<br />What is 1/8 as a percentage?",
+                            options: ["A) 12,5%", "B) 8%", "C) 18%"],
+                            correctAnswer: "A",
+                            explanation: "1/8 = 0,125 * 100% = 12,5%.<br />1/8 = 0.125 * 100% = 12.5%."
+                        },
+                        {
+                            question: "17. Wenn Sie €300 von €4000 Einkommen sparen, welchen Prozentsatz sparen Sie?<br />If you save €300 from €4000 income, what percentage are you saving?",
+                            options: ["A) 7,5%", "B) 5,5%", "C) 8,5%"],
+                            correctAnswer: "A",
+                            explanation: "Prozentsatz = (€300 / €4000) * 100% = 7,5%.<br />Percentage = (€300 / €4000) * 100% = 7.5%."
+                        },
+                        {
+                            question: "18. Was ist der Zinssatz, wenn €1000 in 2 Jahren auf €1210 anwächst?<br />What is the interest rate if €1000 grows to €1210 in 2 years?",
+                            options: ["A) 10%", "B) 9%", "C) 11%"],
+                            correctAnswer: "A",
+                            explanation: "Zinssatz ≈ [(€1210/€1000)^(1/2) - 1] * 100% = 10%.<br />Interest rate ≈ [(€1210/€1000)^(1/2) - 1] * 100% = 10%."
+                        },
+                        {
+                            question: "19. Wenn 60% der Schüler bestehen, welcher Bruchteil fällt durch?<br />If 60% of students pass, what fraction fails?",
+                            options: ["A) 2/5", "B) 3/5", "C) 1/3"],
+                            correctAnswer: "A",
+                            explanation: "40% fallen durch, also 40/100 = 2/5.<br />40% fail, so 40/100 = 2/5."
+                        },
+                        {
+                            question: "20. Ein Laden bietet 30% Rabatt und danach weitere 20%. Wie hoch ist der Gesamtrabatt?<br />A store offers 30% off and then an additional 20%. What is the total discount?",
+                            options: ["A) 44%", "B) 50%", "C) 56%"],
+                            correctAnswer: "A",
+                            explanation: "Gesamtpreis = 100% * 0,7 * 0,8 = 56%; Gesamtrabatt = 44%.<br />Total price = 100% * 0.7 * 0.8 = 56%; Total discount = 44%."
+                        }
+                    ],
+                    userAnswers: Array(20).fill(null),
+                    showExplanations: Array(20).fill(false)
+                };
+            }
+
+            handleAnswer = (index, answer) => {
+                let newAnswers = [...this.state.userAnswers];
+                newAnswers[index] = answer;
+                this.setState({ userAnswers: newAnswers });
+            }
+
+            toggleExplanation = (index) => {
+                let newExplanations = [...this.state.showExplanations];
+                newExplanations[index] = !newExplanations[index];
+                this.setState({ showExplanations: newExplanations });
+            }
+
+            render() {
+                return (
+                    <div className="tab-content">
+                        <h2>Wissensüberprüfung<br />Knowledge Test</h2>
+                        {this.state.questions.map((q, index) => (
+                            <div key={index} className="question">
+                                <p><strong>Frage {index + 1}:</strong> <span dangerouslySetInnerHTML={{ __html: q.question }} /></p>
+                                {q.options.map((option, optionIndex) => (
+                                    <button
+                                        key={optionIndex}
+                                        onClick={() => this.handleAnswer(index, option[0])}
+                                        style={{
+                                            backgroundColor: this.state.userAnswers[index] === option[0] ? '#007bff' : '#28a745'
+                                        }}
+                                    >
+                                        {option}
+                                    </button>
+                                ))}
+                                {this.state.userAnswers[index] && (
+                                    <div>
+                                        <p>
+                                            Ihre Antwort: {this.state.userAnswers[index]}<br />
+                                            Your answer: {this.state.userAnswers[index]}
+                                        </p>
+                                        <p>
+                                            Richtige Antwort: {q.correctAnswer}<br />
+                                            Correct answer: {q.correctAnswer}
+                                        </p>
+                                        <button onClick={() => this.toggleExplanation(index)}>
+                                            {this.state.showExplanations[index] ? "Erklärung verbergen" : "Erklärung anzeigen"}
+                                            <br />
+                                            {this.state.showExplanations[index] ? "Hide Explanation" : "Show Explanation"}
+                                        </button>
+                                        {this.state.showExplanations[index] && (
+                                            <div className="explanation">
+                                                <p dangerouslySetInnerHTML={{ __html: q.explanation }} />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                );
+            }
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+
+    <!-- Optional JavaScript for Charts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Charts are rendered in the componentDidMount lifecycle method in React components
+        });
+    </script>
+</body>
+
+</html>
