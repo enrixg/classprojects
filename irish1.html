@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Irish Language Study Guide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Include D3.js Library -->
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <style>
+    /* CSS Styles */
+    body {
+      background-color: #f0f8ff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    #app {
+      padding: 20px;
+    }
+    h1, h2, h3 {
+      color: #2e8b57;
+    }
+    nav {
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin-right: 15px;
+      text-decoration: none;
+      color: #007BFF;
+      font-weight: bold;
+    }
+    nav a.active {
+      color: #2e8b57;
+    }
+    button {
+      background-color: #2e8b57;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3cb371;
+    }
+    .hidden {
+      display: none;
+    }
+    .quiz {
+      margin-top: 20px;
+    }
+    .quiz h3 {
+      margin-bottom: 10px;
+    }
+    .quiz p {
+      margin: 5px 0;
+    }
+    .infographic {
+      margin-top: 20px;
+    }
+    .infographic svg text {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- The app content will be injected here by JavaScript -->
+  </div>
+
+  <script>
+    // JavaScript Code
+    (function() {
+      const app = document.getElementById('app');
+
+      // Define the topics
+      const topics = [
+        { id: 'introduction', title: 'Introduction' },
+        { id: 'lenition', title: 'Lenition (Séimhiú)' },
+        { id: 'eclipsis', title: 'Eclipsis (Urú)' },
+        { id: 'summary', title: 'Summary of Mutation Rules' },
+        { id: 'practice', title: 'Practice Sentences' },
+        { id: 'test-yourself', title: 'Test Yourself' },
+      ];
+
+      // Render the app
+      function renderApp() {
+        app.innerHTML = `
+          <h1>Irish Language Study Guide</h1>
+          ${renderNav()}
+          <div id="content"></div>
+        `;
+        renderContent(window.location.hash.substring(1) || 'introduction');
+      }
+
+      // Render the navigation
+      function renderNav() {
+        return `
+          <nav>
+            ${topics.map(topic => `
+              <a href="#${topic.id}" id="nav-${topic.id}">${topic.title}</a>
+            `).join('')}
+          </nav>
+        `;
+      }
+
+      // Render the content based on the selected topic
+      function renderContent(topicId) {
+        const content = document.getElementById('content');
+        // Highlight the active nav link
+        topics.forEach(topic => {
+          const navLink = document.getElementById('nav-' + topic.id);
+          if (navLink) {
+            navLink.classList.toggle('active', topic.id === topicId);
+          }
+        });
+
+        switch (topicId) {
+          case 'introduction':
+            content.innerHTML = `
+              <h2>Introduction</h2>
+              <p>
+                Welcome to your comprehensive study guide on initial mutations in the Irish language!
+                This guide is designed to help you understand how Irish nouns change at the beginning
+                of words in different grammatical contexts. We will cover two main types of initial
+                mutations: lenition (<em>séimhiú</em>) and eclipsis (<em>urú</em>). By the end of this guide,
+                you'll be equipped with the knowledge and examples needed to master these concepts.
+              </p>
+            `;
+            break;
+          case 'lenition':
+            content.innerHTML = `
+              <h2>Lenition (Séimhiú)</h2>
+              <p>
+                Lenition, known in Irish as <em>séimhiú</em>, softens the initial consonant of a word.
+                This is typically indicated by adding an "h" after the initial consonant.
+              </p>
+              <h3>Consonant Changes in Lenition</h3>
+              <div id="infographic-lenition" class="infographic"></div>
+              <h3>When to Use Lenition</h3>
+              <ul>
+                <li>After certain possessive adjectives: <em>mo</em> (my), <em>do</em> (your), <em>a</em> (his)</li>
+                <li>After the vocative particle <em>a</em> when addressing someone</li>
+                <li>After certain prepositions: <em>do</em> (to), <em>ar</em> (on)</li>
+                <li>In the past tense of verbs</li>
+              </ul>
+              <h3>Examples and Explanations</h3>
+              <p><strong>Possessive Adjectives</strong></p>
+              <ul>
+                <li><em>Mo bhád</em> (My boat) - "bád" becomes "bhád" after "mo".</li>
+                <li><em>Do charr</em> (Your car) - "carr" becomes "charr" after "do".</li>
+              </ul>
+            `;
+            drawLenitionChart();
+            break;
+          case 'eclipsis':
+            content.innerHTML = `
+              <h2>Eclipsis (Urú)</h2>
+              <p>
+                Eclipsis, or <em>urú</em>, involves prefixing a consonant to the beginning of a word,
+                effectively eclipsing the original initial consonant.
+              </p>
+              <h3>Consonant Changes in Eclipsis</h3>
+              <div id="infographic-eclipsis" class="infographic"></div>
+              <h3>When to Use Eclipsis</h3>
+              <ul>
+                <li>
+                  After certain prepositions with the definite article <em>an</em> (the): <em>ar an</em>,
+                  <em>leis an</em>, <em>ag an</em>
+                </li>
+                <li>
+                  In the plural after the possessive adjectives <em>ár</em> (our), <em>bhur</em> (your plural),
+                  and <em>a</em> (their)
+                </li>
+                <li>
+                  After numbers like <em>seacht</em> (seven), <em>ocht</em> (eight), <em>naoi</em> (nine),
+                  and <em>deich</em> (ten)
+                </li>
+              </ul>
+              <h3>Examples and Explanations</h3>
+              <p><strong>After Prepositions with "An"</strong></p>
+              <ul>
+                <li><em>Ag an ndoras</em> (At the door) - "doras" becomes "ndoras" after "ag an".</li>
+                <li><em>Leis an gcailín</em> (With the girl) - "cailín" becomes "gcailín" after "leis an".</li>
+              </ul>
+            `;
+            drawEclipsisChart();
+            break;
+          case 'summary':
+            content.innerHTML = `
+              <h2>Summary of Mutation Rules</h2>
+              <h3>Lenition Quick Reference</h3>
+              <ul>
+                <li>Add <em>h</em> after the initial consonant.</li>
+                <li>Affects: b, c, d, f, g, m, p, s, t</li>
+                <li>Triggered by:
+                  <ul>
+                    <li><em>Mo</em>, <em>do</em>, <em>a</em> (his)</li>
+                    <li>Vocative particle <em>a</em></li>
+                    <li>Certain prepositions</li>
+                    <li>Past tense verbs</li>
+                  </ul>
+                </li>
+              </ul>
+              <h3>Eclipsis Quick Reference</h3>
+              <ul>
+                <li>Prefix the consonant as per the eclipsis chart.</li>
+                <li>Affects: b, c, d, f, g, p, t, and vowels</li>
+                <li>Triggered by:
+                  <ul>
+                    <li><em>Ár</em>, <em>bhur</em>, <em>a</em> (their)</li>
+                    <li>Prepositions with <em>an</em></li>
+                    <li>Numbers 7-10</li>
+                  </ul>
+                </li>
+              </ul>
+              <div id="infographic-summary" class="infographic"></div>
+            `;
+            drawSummaryChart();
+            break;
+          case 'practice':
+            content.innerHTML = `
+              <h2>Practice Sentences</h2>
+              <p>Let's apply what we've learned in some sentences.</p>
+              <p><strong>I see the woman.</strong></p>
+              <p><em>Feicim an bhean.</em> - "Bean" becomes "bhean" after "an".</p>
+              <p><strong>Our dog is big.</strong></p>
+              <p><em>Tá ár madra mór.</em> - "Madra" does not change because "m" is not eclipsed after "ár".</p>
+            `;
+            break;
+          case 'test-yourself':
+            content.innerHTML = `
+              <h2>Test Yourself</h2>
+              <div id="quiz-test" class="quiz"></div>
+            `;
+            renderQuiz();
+            break;
+          default:
+            content.innerHTML = `<h2>Topic Not Found</h2>`;
+        }
+      }
+
+      // Event listener for hash change
+      window.addEventListener('hashchange', function() {
+        renderContent(window.location.hash.substring(1));
+      });
+
+      // Initial render
+      renderApp();
+
+      // Infographic functions
+      function drawLenitionChart() {
+        const data = [
+          { original: 'b', mutated: 'bh' },
+          { original: 'c', mutated: 'ch' },
+          { original: 'd', mutated: 'dh' },
+          { original: 'f', mutated: 'fh' },
+          { original: 'g', mutated: 'gh' },
+          { original: 'm', mutated: 'mh' },
+          { original: 'p', mutated: 'ph' },
+          { original: 's', mutated: 'sh' },
+          { original: 't', mutated: 'th' },
+        ];
+
+        const svg = d3.select('#infographic-lenition')
+          .append('svg')
+          .attr('width', 400)
+          .attr('height', 300);
+
+        svg.selectAll('text')
+          .data(data)
+          .enter()
+          .append('text')
+          .attr('x', 20)
+          .attr('y', (d, i) => 30 + i * 30)
+          .text(d => `${d.original} ➔ ${d.mutated}`)
+          .attr('font-size', '20px');
+      }
+
+      function drawEclipsisChart() {
+        const data = [
+          { original: 'b', mutated: 'mb' },
+          { original: 'c', mutated: 'gc' },
+          { original: 'd', mutated: 'nd' },
+          { original: 'f', mutated: 'bhf' },
+          { original: 'g', mutated: 'ng' },
+          { original: 'p', mutated: 'bp' },
+          { original: 't', mutated: 'dt' },
+          { original: 'vowel', mutated: 'n-' },
+        ];
+
+        const svg = d3.select('#infographic-eclipsis')
+          .append('svg')
+          .attr('width', 400)
+          .attr('height', 300);
+
+        svg.selectAll('text')
+          .data(data)
+          .enter()
+          .append('text')
+          .attr('x', 20)
+          .attr('y', (d, i) => 30 + i * 30)
+          .text(d => `${d.original} ➔ ${d.mutated}`)
+          .attr('font-size', '20px');
+      }
+
+      function drawSummaryChart() {
+        const data = [
+          { type: 'Lenition', examples: 'b➔bh, c➔ch, d➔dh, ...' },
+          { type: 'Eclipsis', examples: 'b➔mb, c➔gc, d➔nd, ...' },
+        ];
+
+        const svg = d3.select('#infographic-summary')
+          .append('svg')
+          .attr('width', 400)
+          .attr('height', 150);
+
+        svg.selectAll('text')
+          .data(data)
+          .enter()
+          .append('text')
+          .attr('x', 20)
+          .attr('y', (d, i) => 50 + i * 50)
+          .text(d => `${d.type}: ${d.examples}`)
+          .attr('font-size', '20px');
+      }
+
+      // Quiz function for Test Yourself section
+      function renderQuiz() {
+        const quizContainer = document.getElementById('quiz-test');
+        const questions = getTestQuestions();
+        let currentQuestionIndex = 0;
+
+        function showQuestion() {
+          const question = questions[currentQuestionIndex];
+          quizContainer.innerHTML = `
+            <h3>Question ${currentQuestionIndex + 1} of ${questions.length}</h3>
+            <p><strong>${question.question}</strong></p>
+            <form id="quiz-form">
+              <input type="text" name="answer" required />
+              <button type="submit">Submit</button>
+            </form>
+            <div id="quiz-feedback" class="hidden">
+              <p><strong>Your Answer:</strong> <span id="user-answer"></span></p>
+              <p><strong>Correct Answer:</strong> ${question.answer}</p>
+              <p><strong>Explanation:</strong> ${question.explanation}</p>
+              <button id="next-button">${currentQuestionIndex + 1 < questions.length ? 'Next Question' : 'Finish Quiz'}</button>
+            </div>
+          `;
+
+          const form = document.getElementById('quiz-form');
+          form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userAnswer = form.elements['answer'].value.trim();
+            document.getElementById('user-answer').textContent = userAnswer;
+            document.getElementById('quiz-feedback').classList.remove('hidden');
+            form.classList.add('hidden');
+            document.getElementById('next-button').addEventListener('click', function() {
+              currentQuestionIndex++;
+              if (currentQuestionIndex < questions.length) {
+                showQuestion();
+              } else {
+                quizContainer.innerHTML = '<p>You have completed the quiz!</p>';
+              }
+            });
+          });
+        }
+
+        showQuestion();
+      }
+
+      function getTestQuestions() {
+        return [
+          {
+            question: '1. Mo (cat)',
+            answer: 'Mo chat',
+            explanation: '“Cat” becomes “chat” after “mo” due to lenition of “c” to “ch”.',
+          },
+          {
+            question: '2. Do (bád)',
+            answer: 'Do bhád',
+            explanation: '“Bád” becomes “bhád” after “do” due to lenition of “b” to “bh”.',
+          },
+          {
+            question: '3. A (his) (fear)',
+            answer: 'A fhear',
+            explanation: '“Fear” becomes “fhear” after “a” (his) due to lenition of “f” to “fh”.',
+          },
+          {
+            question: '4. A (her) (gairdín)',
+            answer: 'A gairdín',
+            explanation: 'No mutation occurs after “a” (her); “gairdín” remains the same.',
+          },
+          {
+            question: '5. Ár (peann)',
+            answer: 'Ár bpeann',
+            explanation: '“Peann” becomes “bpeann” after “ár” due to eclipsis of “p” to “bp”.',
+          },
+          {
+            question: '6. Bhur (teach)',
+            answer: 'Bhur dteach',
+            explanation: '“Teach” becomes “dteach” after “bhur” due to eclipsis of “t” to “dt”.',
+          },
+          {
+            question: '7. A (their) (garraí)',
+            answer: 'A ngarraí',
+            explanation: '“Garraí” becomes “ngarraí” after “a” (their) due to eclipsis of “g” to “ng”.',
+          },
+          {
+            question: '8. Ag an (banc)',
+            answer: 'Ag an mbanc',
+            explanation: '“Banc” becomes “mbanc” after “ag an” due to eclipsis of “b” to “mb”.',
+          },
+          {
+            question: '9. Leis an (focal)',
+            answer: 'Leis an bhfocal',
+            explanation: '“Focal” becomes “bhfocal” after “leis an” due to eclipsis of “f” to “bhf”.',
+          },
+          {
+            question: '10. Seacht (gúna)',
+            answer: 'Seacht ngúna',
+            explanation: '“Gúna” becomes “ngúna” after “seacht” due to eclipsis of “g” to “ng”.',
+          },
+          {
+            question: '11. An (páirc)',
+            answer: 'An pháirc',
+            explanation: '“Páirc” becomes “pháirc” after “an” (lenition of “p” to “ph” for feminine nouns).',
+          },
+          {
+            question: '12. A Sheáin, conas atá tú?',
+            answer: 'Lenition of “Seán” to “Sheáin” after vocative particle “a”.',
+            explanation: '“Seán” becomes “Sheáin” when directly addressing someone using “a”.',
+          },
+          {
+            question: '13. D\'ith mé an (arán).',
+            answer: 'D\'ith mé an t-arán.',
+            explanation: '“Arán” takes a “t-” prefix after “an” because it starts with a vowel.',
+          },
+          {
+            question: '14. Chonaic sí an (capall).',
+            answer: 'Chonaic sí an capall.',
+            explanation: 'No mutation occurs; “capall” remains the same after “an”.',
+          },
+          {
+            question: '15. Ocht (bord)',
+            answer: 'Ocht mbord',
+            explanation: '“Bord” becomes “mbord” after “ocht” due to eclipsis of “b” to “mb”.',
+          },
+          {
+            question: '16. Do (súil)',
+            answer: 'Do shúil',
+            explanation: '“Súil” becomes “shúil” after “do” due to lenition of “s” to “sh”.',
+          },
+          {
+            question: '17. Mo (fiacail)',
+            answer: 'Mo fhiacail',
+            explanation: '“Fiacail” becomes “fhiacail” after “mo” due to lenition of “f” to “fh”.',
+          },
+          {
+            question: '18. An (t-éan) atá sa chrann.',
+            answer: 'An t-éan atá sa chrann.',
+            explanation: '“Éan” takes a “t-” prefix after “an” because it starts with a vowel.',
+          },
+          {
+            question: '19. A Mháire, an dtiocfaidh tú linn?',
+            answer: 'Lenition of “Máire” to “Mháire” after vocative particle “a”.',
+            explanation: '“Máire” becomes “Mháire” when directly addressing someone using “a”.',
+          },
+          {
+            question: '20. Cheannaigh siad naoi (úll).',
+            answer: 'Cheannaigh siad naoi n-úll',
+            explanation: '“Úll” becomes “n-úll” after “naoi” due to eclipsis of vowels with “n-”.',
+          },
+        ];
+      }
+    })();
+  </script>
+</body>
+</html>
