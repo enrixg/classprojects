@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <!-- Meta Tags and Title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktiver Studienführer - German Language Guide</title>
+    <!-- Stylesheets and Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <!-- React and Babel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js" crossorigin></script>
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Plugin for Data Labels -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #fefefe;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        nav {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            margin: 5px;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        nav button:hover {
+            background-color: #0056b3;
+        }
+
+        .tab-content {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #007bff;
+        }
+
+        h3 {
+            color: #0056b3;
+        }
+
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #e9f5ff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
+        }
+
+        .question button {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .question button:hover {
+            background-color: #218838;
+        }
+
+        .question p {
+            font-size: 18px;
+        }
+
+        .explanation {
+            background-color: #d4edda;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 10px;
+            color: #155724;
+        }
+
+        /* Chart Styles */
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 400px;
+            width: 80%;
+        }
+
+        /* Feedback Styles */
+        .feedback {
+            background-color: #fff3cd;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 1px solid #ffeeba;
+            color: #856404;
+        }
+
+        .feedback h3 {
+            color: #856404;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav button {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+
+            .question p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        class App extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    currentTab: 'time',
+                };
+            }
+
+            changeTab = (tab) => {
+                this.setState({ currentTab: tab });
+            }
+
+            render() {
+                return (
+                    <div className="container">
+                        <header>
+                            <h1>Interaktiver Studienführer<br />Interactive Study Guide</h1>
+                            <nav>
+                                <button onClick={() => this.changeTab('time')}>Die Uhrzeit</button>
+                                <button onClick={() => this.changeTab('daily')}>Tagesablauf</button>
+                                <button onClick={() => this.changeTab('meals')}>Mahlzeiten</button>
+                                <button onClick={() => this.changeTab('modalVerbs')}>Modalverben</button>
+                                <button onClick={() => this.changeTab('school')}>Schule & AGs</button>
+                                <button onClick={() => this.changeTab('dialogues')}>Dialoge</button>
+                                <button onClick={() => this.changeTab('test')}>Wissensüberprüfung</button>
+                            </nav>
+                        </header>
+                        {this.state.currentTab === 'time' && <TimeTopic />}
+                        {this.state.currentTab === 'daily' && <DailyRoutine />}
+                        {this.state.currentTab === 'meals' && <Meals />}
+                        {this.state.currentTab === 'modalVerbs' && <ModalVerbs />}
+                        {this.state.currentTab === 'school' && <SchoolActivities />}
+                        {this.state.currentTab === 'dialogues' && <Dialogues />}
+                        {this.state.currentTab === 'test' && <KnowledgeTest />}
+                    </div>
+                );
+            }
+        }
+
+        /* Topic Components */
+
+        class TimeTopic extends React.Component {
+            componentDidMount() {
+                this.renderTimeChart();
+            }
+
+            renderTimeChart() {
+                const ctx = document.getElementById('timeChart').getContext('2d');
+                const data = {
+                    labels: ['Viertel nach', 'Halb', 'Viertel vor'],
+                    datasets: [{
+                        label: 'Zeitangaben in Minuten',
+                        data: [15, 30, 15],
+                        backgroundColor: ['#ff6384', '#36a2eb', '#ffcd56']
+                    }]
+                };
+                const options = {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        title: {
+                            display: true,
+                            text: 'Zeitangaben in Minuten\nTime Expressions in Minutes'
+                        }
+                    }
+                };
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: data,
+                    options: options
+                });
+            }
+
+            render() {
+                return (
+                    <div className="tab-content">
+                        <h2>Die Uhrzeit<br />Telling Time</h2>
+                        <p>
+                            Das Fragen nach der Uhrzeit und das Nennen der Uhrzeit sind wichtige Grundlagen in der deutschen Sprache. Es gibt einige Besonderheiten und Ausnahmen, die man beachten sollte.<br />
+                            Asking for and telling time are essential basics in the German language. There are some peculiarities and exceptions to be aware of.
+                        </p>
+
+                        <h3>Fragen nach der Uhrzeit<br />Asking for the Time</h3>
+                        <p><strong>German:</strong> Wie spät ist es? / Wie viel Uhr ist es?</p>
+                        <p><strong>English:</strong> What time is it?</p>
+
+                        <h3>Die Uhrzeit angeben<br />Telling the Time</h3>
+                        <ul>
+                            <li><strong>Vollstunde:</strong> Es ist drei Uhr. / It's three o'clock.</li>
+                            <li><strong>Halbe Stunde:</strong> Es ist halb vier. / It's half past three. (Note: In German, 'halb vier' means 'halfway to four')</li>
+                            <li><strong>Viertel nach:</strong> Es ist Viertel nach drei. / It's a quarter past three.</li>
+                            <li><strong>Viertel vor:</strong> Es ist Viertel vor vier. / It's a quarter to four.</li>
+                            <li><strong>Minutenangaben:</strong> Es ist zwanzig nach drei. / It's twenty past three.</li>
+                            <li><strong>Besonderheit:</strong> In manchen Regionen Deutschlands sagt man 'Dreiviertel vier' statt 'Viertel vor vier'.<br />In some regions of Germany, people say 'Dreiviertel vier' instead of 'Viertel vor vier'.</li>
+                        </ul>
+
+                        <h3>Beispiele mit Ausnahmen<br />Examples with Exceptions</h3>
+                        <p><strong>German:</strong> Es ist fünf nach halb neun. (8:35 Uhr)</p>
+                        <p><strong>English:</strong> It's twenty-five to nine. (8:35 AM)</p>
+
+                        <p><strong>German:</strong> Es ist zehn vor zwölf. (11:50 Uhr)</p>
+                        <p><strong>English:</strong> It's ten to twelve. (11:50 AM)</p>
+
+                        <div className="chart-container">
+                            <canvas id="timeChart"></canvas>
+                        </div>
+                        <p>
+                            <strong>Grafik Erklärung:</strong> Diese Grafik zeigt die Verteilung der Minuten für verschiedene Zeitangaben: 'Viertel nach' entspricht 15 Minuten, 'Halb' entspricht 30 Minuten, und 'Viertel vor' entspricht 15 Minuten.<br />
+                            <strong>Graphic Explanation:</strong> This chart displays the distribution of minutes for different time expressions: 'Viertel nach' equals 15 minutes, 'Halb' equals 30 minutes, and 'Viertel vor' equals 15 minutes.
+                        </p>
+                    </div>
+                );
+            }
+        }
+
+        class DailyRoutine extends React.Component {
+            componentDidMount() {
+                // Additional code if needed
+            }
+
+            render() {
+                return (
+                    <div className="tab-content">
+                        <h2>Tagesablauf<br />Daily Routine</h2>
+                        <p>
+                            Beschreibe deinen Tagesablauf mit den richtigen Zeitangaben und Verben. Achte auf die korrekte Satzstellung und trennbare Verben.<br />
+                            Describe your daily routine using the correct time expressions and verbs. Pay attention to the correct word order and separable verbs.
+                        </p>
+
+                        <h3>Wichtige Verben und ihre Besonderheiten<br />Important Verbs and Their Peculiarities</h3>
+                        <ul>
+                            <li><strong>aufstehen (trennbares Verb):</strong> Ich stehe um sieben Uhr <em>auf</em>. / I get <em>up</em> at seven o'clock.</li>
+                            <li><strong>frühstücken:</strong> Ich frühstücke um halb acht. / I have breakfast at half past seven.</li>
+                            <li><strong>zur Schule gehen:</strong> Ich gehe um acht Uhr zur Schule. / I go to school at eight o'clock.</li>
+                            <li><strong>Hausaufgaben machen:</strong> Ich mache um drei Uhr meine Hausaufgaben. / I do my homework at three o'clock.</li>
+                            <li><strong>zu Mittag essen (trennbares Verb):</strong> Ich esse um zwölf Uhr zu Mittag. / I have lunch at twelve o'clock.</li>
+                            <li><strong>ins Bett gehen:</strong> Ich gehe um neun Uhr ins Bett. / I go to bed at nine o'clock.</li>
+                        </ul>
+
+                        <h3>Besonderheiten und Ausnahmen<br />Peculiarities and Exceptions</h3>
+                        <p>
+                            Bei trennbaren Verben steht die Präposition am Satzende.<br />
+                            With separable verbs, the prefix goes at the end of the sentence.
+                        </p>
+                        <p>
+                            Beispiel:<br />
+                            <strong>German:</strong> Ich <strong>stehe</strong> um sieben Uhr <strong>auf</strong>.<br />
+                            <strong>English:</strong> I get <strong>up</strong> at seven o'clock.
+                        </p>
+
+                        <h3>Visualisierung des Tagesablaufs<br />Visualization of Daily Routine</h3>
+                        <p>
+                            Stellen Sie sich einen Tagesplaner vor, der die Aktivitäten und die entsprechenden Uhrzeiten anzeigt. Dies hilft dabei, den Tagesablauf strukturiert zu verstehen.<br />
+                            Imagine a daily planner showing activities and their corresponding times. This helps to understand the daily routine in a structured way.
+                        </p>
+                    </div>
+                );
+            }
+        }
+
+        class Meals extends React.Component {
+            componentDidMount() {
+                this.renderFoodChart();
+            }
+
+            renderFoodChart() {
+                const ctx = document.getElementById('foodChart').getContext('2d');
+                const data = {
+                    labels: ['Frühstück', 'Mittagessen', 'Abendessen'],
+                    datasets: [{
+                        label: 'Typische Mahlzeiten pro Tag',
+                        data: [1, 1, 1],
+                        backgroundColor: ['#ffcc00', '#ff9900', '#ff6600']
+                    }]
+                };
+                const options = {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        title: {
+                            display: true,
+                            text: 'Typische Mahlzeiten pro Tag\nTypical Meals per Day'
+                        }
+                    }
+                };
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: options
+                });
+            }
+
+            render() {
+                return (
+                    <div className="tab-content">
+                        <h2>Mahlzeiten und Essen<br />Meals and Food</h2>
+                        <p>
+                            Lerne Vokabeln rund um Mahlzeiten und typische Lebensmittel. Beachte regionale Unterschiede und kulturelle Besonderheiten.<br />
+                            Learn vocabulary about meals and typical food items. Note regional differences and cultural peculiarities.
+                        </p>
+
+                        <h3>Typische Mahlzeiten<br />Typical Meals</h3>
+                        <ul>
+                            <li><strong>Frühstück:</strong> breakfast</li>
+                            <li><strong>Mittagessen:</strong> lunch</li>
+                            <li><strong>Abendessen (auch 'Abendbrot'):</strong> dinner/supper</li>
+                            <li><strong>Zwischenmahlzeit (Snack):</strong> snack</li>
+                        </ul>
+
+                        <h3>Lebensmittel und Getränke<br />Food and Drinks</h3>
+                        <ul>
+                            <li><strong>das Brot:</strong> bread</li>
+                            <li><strong>die Butter:</strong> butter</li>
+                            <li><strong>die Marmelade:</strong> jam</li>
+                            <li><strong>der Käse:</strong> cheese</li>
+                            <li><strong>die Wurst:</strong> sausage</li>
+                            <li><strong>das Müsli:</strong> cereal</li>
+                            <li><strong>die Milch:</strong> milk</li>
+                            <li><strong>der Saft:</strong> juice</li>
+                            <li><strong>der Tee:</strong> tea</li>
+                            <li><strong>der Kaffee:</strong> coffee</li>
+                        </ul>
+
+                        <h3>Kulturelle Besonderheiten<br />Cultural Peculiarities</h3>
+                        <p>
+                            In Deutschland ist das Frühstück oft eine wichtige Mahlzeit mit Brot, Aufschnitt und Käse.<br />
+                            In Germany, breakfast is often an important meal with bread, cold cuts, and cheese.
+                        </p>
+                        <p>
+                            Das Abendessen kann kalt sein und wird manchmal 'Abendbrot' genannt.<br />
+                            Dinner can be cold and is sometimes called 'Abendbrot' (evening bread).
+                        </p>
+
+                        <div className="chart-container">
+                            <canvas id="foodChart"></canvas>
+                        </div>
+                        <p>
+                            <strong>Grafik Erklärung:</strong> Diese Grafik zeigt die Anzahl der typischen Mahlzeiten pro Tag: Frühstück, Mittagessen und Abendessen.<br />
+                            <strong>Graphic Explanation:</strong> This chart shows the number of typical meals per day: breakfast, lunch, and dinner.
+                        </p>
+                    </div>
+                );
+            }
+        }
+
+        class ModalVerbs extends React.Component {
+            componentDidMount() {
+                this.renderModalVerbsChart();
+            }
+
+            renderModalVerbsChart() {
+                const ctx = document.getElementById('modalVerbsChart').getContext('2d');
+                const data = {
+                    labels: ['ich', 'du', 'er/sie/es', 'wir', 'ihr', 'sie/Sie'],
+                    datasets: [{
+                        label: 'möchten',
+                        data: [1, 1, 1, 1, 1, 1],
+                        backgroundColor: '#6c757d'
+                    }]
+                };
+                const options = {
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#fff',
+                            font: { weight: 'bold', size: 16 },
+                            formatter: function (value, context) {
+                                const pronoun = context.chart.data.labels[context.dataIndex];
+                                const conjugation = ['möchte', 'möchtest', 'möchte', 'möchten', 'möchtet', 'möchten'][context.dataIndex];
+                                return pronoun + ' ' + conjugation;
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: { display: true }
+                    },
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Konjugation von "möchten"\nConjugation of "möchten"'
+                        }
+                    }
+                };
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: options,
+                    plugins: [ChartDataLabels]
+                });
+            }
+
+            render() {
+                return (
+                    <div className="tab-content">
+                        <h2>Modalverben<br />Modal Verbs</h2>
+                        <p>
+                            Modalverben wie "möchten", "müssen", "können", "dürfen", "sollen" und "wollen" helfen, Wünsche, Notwendigkeiten, Fähigkeiten, Erlaubnisse und Absichten auszudrücken.<br />
+                            Modal verbs like "möchten", "müssen", "können", "dürfen", "sollen", and "wollen" help express desires, necessities, abilities, permissions, and intentions.
+                        </p>
+
+                        <h3>"Möchten" - Wünsche ausdrücken<br />"Möchten" - Expressing Wishes</h3>
+                        <p><strong>German:</strong> Ich möchte schwimmen.</p>
+                        <p><strong>English:</strong> I would like to swim.</p>
+
+                        <h3>"Müssen" - Notwendigkeiten ausdrücken<br />"Müssen" - Expressing Necessities</h3>
+                        <p><strong>German:</strong> Ich muss meine Hausaufgaben machen.</p>
+                        <p><strong>English:</strong> I have to do my homework.</p>
+
+                        <h3>Konjugation von "möchten" und "müssen"<br />Conjugation of "möchten" and "müssen"</h3>
+                        <table>
+                            <tr>
+                                <th>Pronomen<br />Pronoun</th>
+                                <th>möchten</th>
+                                <th>müssen</th>
+                            </tr>
+                            <tr>
+                                <td>ich</td>
+                                <td>möchte</td>
+                                <td>muss</td>
+                            </tr>
+                            <tr>
+                                <td>du</td>
+                                <td>möchtest</td>
+                                <td>musst</td>
+                            </tr>
+                            <tr>
+                                <td>er/sie/es</td>
+                                <td>möchte</td>
+                                <td>muss</td>
+                            </tr>
+                            <tr>
+                                <td>wir</td>
+                                <td>möchten</td>
+                                <td>müssen</td>
+                            </tr>
+                            <tr>
+                                <td>ihr</td>
+                                <td>möchtet</td>
+                                <td>müsst</td>
+                            </tr>
+                            <tr>
+                                <td>sie/Sie</td>
+                                <td>möchten</td>
+                                <td>müssen</td>
+                            </tr>
+                        </table>
+
+                        <h3>Besonderheiten und Ausnahmen<br />Peculiarities and Exceptions</h3>
+                        <p>
+                            Beachte, dass bei Modalverben das Vollverb im Infinitiv am Satzende steht.<br />
+                            Note that with modal verbs, the main verb in the infinitive form is placed at the end of the sentence.
+                        </p>
+                        <p>
+                            Beispiel:<br />
+                            <strong>German:</strong> Ich <strong>möchte</strong> jetzt schwimmen <strong>gehen</strong>.<br />
+                            <strong>English:</strong> I <strong>would like</strong> to <strong>go</strong> swimming now.
+                        </p>
+
+                        <div className="chart-container">
+                            <canvas id="modalVerbsChart"></canvas>
+                        </div>
+                        <p>
+                            <strong>Grafik Erklärung:</strong> Diese horizontale Balkendiagramm zeigt die Konjugation des Modalverbs "möchten" für verschiedene Pronomen. Jeder Balken repräsentiert die konjugierte Form.<br />
+                            <strong>Graphic Explanation:</strong> This horizontal bar chart displays the conjugation of the modal verb "möchten" for different pronouns. Each bar represents the conjugated form.
+                        </p>
+                    </div>
+                );
+            }
+        }
+
+        class SchoolActivities extends React.Component {
+            componentDidMount() {
+                // Additional code if needed
+            }
+
+            render() {
+                return (
+                    <div className="tab-content">
+                        <h2>Schule und AGs<br />School and Clubs</h2>
+                        <p>
+                            Entdecke verschiedene Schulaktivitäten und Arbeitsgemeinschaften (AGs). Beachte, dass einige Begriffe regionale Unterschiede aufweisen können.<br />
+                            Explore different school activities and clubs. Note that some terms may vary regionally.
+                        </p>
+
+                        <h3>Schulvokabeln<br />School Vocabulary</h3>
+                        <ul>
+                            <li><strong>die Schule:</strong> school</li>
+                            <li><strong>der Unterricht:</strong> lesson/class</li>
+                            <li><strong>die Hausaufgaben:</strong> homework</li>
+                            <li><strong>die AG (Arbeitsgemeinschaft):</strong> club/extracurricular activity</li>
+                            <li><strong>der Schachclub:</strong> chess club</li>
+                            <li><strong>die Theater-AG:</strong> theater group</li>
+                            <li><strong>die Mal-AG:</strong> art club</li>
+                            <li><strong>der Sportverein:</strong> sports club</li>
+                        </ul>
+
+                        <h3>Beispielsätze mit Kontext<br />Example Sentences with Context</h3>
+                        <p><strong>German:</strong> Ich möchte in der Theater-AG mitmachen, weil ich gerne schauspiele.</p>
+                        <p><strong>English:</strong> I want to join the theater group because I like acting.</p>
+
+                        <p><strong>German:</strong> Wann findet die Schach-AG statt?</p>
+                        <p><strong>English:</strong> When does the chess club take place?</p>
+
+                        <h3>Besonderheiten und Hinweise<br />Peculiarities and Notes</h3>
+                        <p>
+                            Manche AGs finden nach der Schule statt, andere während der Pausen.<br />
+                            Some clubs take place after school, others during breaks.
+                        </p>
+                        <p>
+                            In Deutschland gibt es auch Ganztagsschulen mit erweiterten Angeboten.<br />
+                            In Germany, there are also all-day schools with extended offerings.
+                        </p>
+
+                        <p>
+                            <strong>Visualisierung:</strong> Stellen Sie sich ein Schaubild vor, das die verschiedenen AGs und ihre Zeiten darstellt. Dies kann helfen, die Auswahl und Planung zu erleichtern.<br />
+                            <strong>Visualization:</strong> Imagine a diagram showing the different clubs and their schedules. This can help in choosing and planning.
+                        </p>
+                    </div>
+                );
+            }
+        }
+
+        class Dialogues extends React.Component {
+            render() {
+                return (
+                    <div className="tab-content">
+                        <h2>Beispieldialoge<br />Sample Dialogues</h2>
+                        <p>
+                            Übe das Führen von Gesprächen auf Deutsch. Beachte Höflichkeitsformen und regionale Ausdrücke.<br />
+                            Practice having conversations in German. Pay attention to polite forms and regional expressions.
+                        </p>
+
+                        <h3>Dialog 1: Einladung ins Kino<br />Dialogue 1: Invitation to the Cinema</h3>
+                        <p><strong>German:</strong></p>
+                        <p>
+                            <strong>Max:</strong> Möchtest du mit ins Kino kommen?<br />
+                            <strong>Lisa:</strong> Ja, gerne! Welcher Film läuft?<br />
+                            <strong>Max:</strong> Der neue Abenteuerfilm.<br />
+                            <strong>Lisa:</strong> Cool! Wann treffen wir uns?<br />
+                            <strong>Max:</strong> Um sechs Uhr vor dem Kino.<br />
+                            <strong>Lisa:</strong> Super, bis dann!
+                        </p>
+                        <p><strong>English:</strong></p>
+                        <p>
+                            <strong>Max:</strong> Would you like to come to the cinema?<br />
+                            <strong>Lisa:</strong> Yes, I'd love to! Which movie is playing?<br />
+                            <strong>Max:</strong> The new adventure film.<br />
+                            <strong>Lisa:</strong> Cool! When do we meet?<br />
+                            <strong>Max:</strong> At six o'clock in front of the cinema.<br />
+                            <strong>Lisa:</strong> Great, see you then!
+                        </p>
+
+                        <h3>Dialog 2: Hausaufgaben machen<br />Dialogue 2: Doing Homework</h3>
+                        <p><strong>German:</strong></p>
+                        <p>
+                            <strong>Sara:</strong> Hast du die Mathe-Hausaufgaben schon gemacht?<br />
+                            <strong>Tom:</strong> Nein, ich muss sie noch machen.<br />
+                            <strong>Sara:</strong> Wollen wir sie zusammen machen?<br />
+                            <strong>Tom:</strong> Ja, das ist eine gute Idee.<br />
+                            <strong>Sara:</strong> Treffen wir uns um vier Uhr bei mir?<br />
+                            <strong>Tom:</strong> Gerne, bis später!
+                        </p>
+                        <p><strong>English:</strong></p>
+                        <p>
+                            <strong>Sara:</strong> Have you already done the math homework?<br />
+                            <strong>Tom:</strong> No, I still have to do it.<br />
+                            <strong>Sara:</strong> Shall we do it together?<br />
+                            <strong>Tom:</strong> Yes, that's a good idea.<br />
+                            <strong>Sara:</strong> Shall we meet at my place at four o'clock?<br />
+                            <strong>Tom:</strong> Sure, see you later!
+                        </p>
+
+                        <h3>Höflichkeitsformen und regionale Ausdrücke<br />Polite Forms and Regional Expressions</h3>
+                        <p>
+                            In einigen Regionen sagt man "Grüß Gott" statt "Guten Tag".<br />
+                            In some regions, people say "Grüß Gott" instead of "Guten Tag".
+                        </p>
+                        <p>
+                            Höflichkeitsform "Sie" wird verwendet, um Respekt zu zeigen.<br />
+                            The polite form "Sie" is used to show respect.
+                        </p>
+
+                        <p>
+                            <strong>Visualisierung:</strong> Denken Sie an Sprechblasen mit den Dialogen, um das Lesen und Verstehen zu erleichtern.<br />
+                            <strong>Visualization:</strong> Think of speech bubbles containing the dialogues to make reading and understanding easier.
+                        </p>
+                    </div>
+                );
+            }
+        }
+
+        class KnowledgeTest extends React.Component {
+            constructor(props) {
+                super(props);
+                const questions = [
+                    // Time Topic Questions (10 questions)
+                    {
+                        topic: 'time',
+                        question: "Wie spät ist es, wenn der große Zeiger auf der 12 und der kleine auf der 5 steht?",
+                        options: ["A) Fünf Uhr", "B) Halb fünf", "C) Zwölf Uhr"],
+                        correctAnswer: "A",
+                        explanation: "Der große Zeiger auf 12 bedeutet volle Stunde, der kleine Zeiger auf 5 bedeutet fünf Uhr.<br/>The big hand on 12 means full hour, the small hand on 5 means five o'clock."
+                    },
+                    {
+                        topic: 'time',
+                        question: "Was bedeutet 'Es ist Viertel nach acht' auf Englisch?",
+                        options: ["A) Es ist Viertel vor acht", "B) Es ist Viertel nach acht", "C) Es ist halb acht"],
+                        correctAnswer: "B",
+                        explanation: "'Viertel nach acht' bedeutet 'quarter past eight'.<br/>'Viertel nach acht' means 'quarter past eight'."
+                    },
+                    {
+                        topic: 'time',
+                        question: "Wie sagt man 'It's half past seven' auf Deutsch?",
+                        options: ["A) Es ist halb sieben", "B) Es ist halb acht", "C) Es ist sieben Uhr"],
+                        correctAnswer: "B",
+                        explanation: "'Half past seven' ist 'halb acht' auf Deutsch.<br/>'Half past seven' is 'halb acht' in German."
+                    },
+                    {
+                        topic: 'time',
+                        question: "Was bedeutet 'Es ist zehn vor zwölf' auf Englisch?",
+                        options: ["A) It's ten past twelve", "B) It's ten to twelve", "C) It's twelve o'clock"],
+                        correctAnswer: "B",
+                        explanation: "'zehn vor zwölf' bedeutet 'ten to twelve'.<br/>'zehn vor zwölf' means 'ten to twelve'."
+                    },
+                    {
+                        topic: 'time',
+                        question: "Wie spät ist es, wenn der große Zeiger auf der 6 und der kleine auf der 3 steht?",
+                        options: ["A) Drei Uhr", "B) Halb vier", "C) Sechs Uhr"],
+                        correctAnswer: "B",
+                        explanation: "Der große Zeiger auf 6 bedeutet halb, der kleine Zeiger auf 3 bedeutet drei, also ist es halb vier.<br/>The big hand on 6 means half past, the small hand on 3 means three, so it's half past three."
+                    },
+                    {
+                        topic: 'time',
+                        question: "Was bedeutet 'Es ist zwanzig nach neun' auf Englisch?",
+                        options: ["A) It's twenty to nine", "B) It's twenty past nine", "C) It's nine o'clock"],
+                        correctAnswer: "B",
+                        explanation: "'zwanzig nach neun' bedeutet 'twenty past nine'.<br/>'zwanzig nach neun' means 'twenty past nine'."
+                    },
+                    {
+                        topic: 'time',
+                        question: "Wie sagt man 'It's quarter to five' auf Deutsch?",
+                        options: ["A) Es ist Viertel vor fünf", "B) Es ist Viertel nach fünf", "C) Es ist halb fünf"],
+                        correctAnswer: "A",
+                        explanation: "'quarter to five' ist 'Viertel vor fünf' auf Deutsch.<br/>'quarter to five' is 'Viertel vor fünf' in German."
+                    },
+                    {
+                        topic: 'time',
+                        question: "Was bedeutet 'Es ist zwölf Uhr' auf Englisch?",
+                        options: ["A) It's twelve o'clock", "B) It's twelve past twelve", "C) It's half past twelve"],
+                        correctAnswer: "A",
+                        explanation: "'zwölf Uhr' bedeutet 'twelve o'clock'.<br/>'zwölf Uhr' means 'twelve o'clock'."
+                    },
+                    {
+                        topic: 'time',
+                        question: "Wie spät ist es, wenn der große Zeiger auf der 9 und der kleine auf der 2 steht?",
+                        options: ["A) Zwei Uhr", "B) Viertel vor zwei", "C) Viertel nach zwei"],
+                        correctAnswer: "B",
+                        explanation: "Der große Zeiger auf 9 bedeutet Viertel vor, der kleine Zeiger auf 2 bedeutet zwei Uhr.<br/>The big hand on 9 means quarter to, the small hand on 2 means two o'clock."
+                    },
+                    {
+                        topic: 'time',
+                        question: "Was bedeutet 'drei Viertel vier' auf Englisch?",
+                        options: ["A) It's three quarters past four", "B) It's quarter to four", "C) It's three quarters to four"],
+                        correctAnswer: "B",
+                        explanation: "'drei Viertel vier' bedeutet 'quarter to four'.<br/>'drei Viertel vier' means 'quarter to four'."
+                    },
+
+                    // Daily Routine Questions (10 questions)
+                    {
+                        topic: 'daily',
+                        question: "Was bedeutet 'Ich stehe um sieben Uhr auf' auf Englisch?",
+                        options: ["A) Ich gehe um sieben Uhr ins Bett", "B) Ich stehe um sieben Uhr auf", "C) Ich frühstücke um sieben Uhr"],
+                        correctAnswer: "B",
+                        explanation: "'Ich stehe um sieben Uhr auf' bedeutet 'I get up at seven o'clock'.<br/>'Ich stehe um sieben Uhr auf' means 'I get up at seven o'clock'."
+                    },
+                    {
+                        topic: 'daily',
+                        question: "Welches Verb ist trennbar?",
+                        options: ["A) frühstücken", "B) aufstehen", "C) schlafen"],
+                        correctAnswer: "B",
+                        explanation: "'aufstehen' ist ein trennbares Verb.<br/>'aufstehen' is a separable verb."
+                    },
+                    {
+                        topic: 'daily',
+                        question: "Was bedeutet 'Ich frühstücke um halb acht' auf Englisch?",
+                        options: ["A) I have breakfast at half past seven", "B) I have breakfast at half past eight", "C) I have breakfast at eight o'clock"],
+                        correctAnswer: "A",
+                        explanation: "'halb acht' bedeutet 'half past seven'.<br/>'halb acht' means 'half past seven'."
+                    },
+                    {
+                        topic: 'daily',
+                        question: "Wie sagt man 'I do my homework at three o'clock' auf Deutsch?",
+                        options: ["A) Ich mache um drei Uhr meine Hausaufgaben", "B) Ich mache meine Hausaufgaben um drei Uhr", "C) Beide sind korrekt"],
+                        correctAnswer: "C",
+                        explanation: "Beide Satzstellungen sind korrekt.<br/>Both sentence structures are correct."
+                    },
+                    {
+                        topic: 'daily',
+                        question: "Was bedeutet 'Ich gehe um acht Uhr zur Schule' auf Englisch?",
+                        options: ["A) I go to school at eight o'clock", "B) I go to school at seven o'clock", "C) I go to school at nine o'clock"],
+                        correctAnswer: "A",
+                        explanation: "'Ich gehe um acht Uhr zur Schule' bedeutet 'I go to school at eight o'clock'.<br/>'Ich gehe um acht Uhr zur Schule' means 'I go to school at eight o'clock'."
+                    },
+                    {
+                        topic: 'daily',
+                        question: "Welches Verb ist nicht trennbar?",
+                        options: ["A) aufstehen", "B) essen", "C) zu Mittag essen"],
+                        correctAnswer: "B",
+                        explanation: "'essen' ist ein nicht trennbares Verb.<br/>'essen' is a non-separable verb."
+                    },
+                    {
+                        topic: 'daily',
+                        question: "Was bedeutet 'Ich esse um zwölf Uhr zu Mittag' auf Englisch?",
+                        options: ["A) I have lunch at twelve o'clock", "B) I have breakfast at twelve o'clock", "C) I have dinner at twelve o'clock"],
+                        correctAnswer: "A",
+                        explanation: "'zu Mittag essen' bedeutet 'have lunch'.<br/>'zu Mittag essen' means 'have lunch'."
+                    },
+                    {
+                        topic: 'daily',
+                        question: "Wie sagt man 'I go to bed at nine o'clock' auf Deutsch?",
+                        options: ["A) Ich gehe um neun Uhr ins Bett", "B) Ich gehe ins Bett um neun Uhr", "C) Beide sind korrekt"],
+                        correctAnswer: "C",
+                        explanation: "Beide Satzstellungen sind korrekt.<br/>Both sentence structures are correct."
+                    },
+                    {
+                        topic: 'daily',
+                        question: "Was bedeutet 'Ich mache meine Hausaufgaben' auf Englisch?",
+                        options: ["A) I do my homework", "B) I do my chores", "C) I do my studies"],
+                        correctAnswer: "A",
+                        explanation: "'Hausaufgaben' bedeutet 'homework'.<br/>'Hausaufgaben' means 'homework'."
+                    },
+                    {
+                        topic: 'daily',
+                        question: "Welches Verb ist trennbar?",
+                        options: ["A) schlafen", "B) zu Mittag essen", "C) lernen"],
+                        correctAnswer: "B",
+                        explanation: "'zu Mittag essen' ist ein trennbares Verb.<br/>'zu Mittag essen' is a separable verb."
+                    },
+
+                    // Meals Questions (10 questions)
+                    {
+                        topic: 'meals',
+                        question: "Was bedeutet 'die Wurst' auf Englisch?",
+                        options: ["A) Käse", "B) Wurst", "C) Brot"],
+                        correctAnswer: "B",
+                        explanation: "'die Wurst' bedeutet 'sausage'.<br/>'die Wurst' means 'sausage'."
+                    },
+                    {
+                        topic: 'meals',
+                        question: "Welches Getränk ist typisch für das Frühstück in Deutschland?",
+                        options: ["A) Bier", "B) Milch", "C) Wein"],
+                        correctAnswer: "B",
+                        explanation: "Milch ist ein typisches Frühstücksgetränk.<br/>Milk is a typical breakfast drink."
+                    },
+                    {
+                        topic: 'meals',
+                        question: "Was bedeutet 'das Müsli' auf Englisch?",
+                        options: ["A) Cereal", "B) Milch", "C) Saft"],
+                        correctAnswer: "A",
+                        explanation: "'das Müsli' bedeutet 'cereal'.<br/>'das Müsli' means 'cereal'."
+                    },
+                    {
+                        topic: 'meals',
+                        question: "Wie sagt man 'I have breakfast with jam' auf Deutsch?",
+                        options: ["A) Ich frühstücke mit Marmelade", "B) Ich esse Marmelade zum Frühstück", "C) Beide sind korrekt"],
+                        correctAnswer: "C",
+                        explanation: "Beide Satzstellungen sind korrekt.<br/>Both sentence structures are correct."
+                    },
+                    {
+                        topic: 'meals',
+                        question: "Was bedeutet 'der Käse' auf Englisch?",
+                        options: ["A) Butter", "B) Käse", "C) Brot"],
+                        correctAnswer: "B",
+                        explanation: "'der Käse' bedeutet 'cheese'.<br/>'der Käse' means 'cheese'."
+                    },
+                    {
+                        topic: 'meals',
+                        question: "Was bedeutet 'zu Mittag essen' auf Englisch?",
+                        options: ["A) Have breakfast", "B) Have lunch", "C) Have dinner"],
+                        correctAnswer: "B",
+                        explanation: "'zu Mittag essen' bedeutet 'have lunch'.<br/>'zu Mittag essen' means 'have lunch'."
+                    },
+                    {
+                        topic: 'meals',
+                        question: "Wie sagt man 'I drink orange juice' auf Deutsch?",
+                        options: ["A) Ich trinke Orangensaft", "B) Ich esse Orangensaft", "C) Ich trinke Apfelsaft"],
+                        correctAnswer: "A",
+                        explanation: "Orangensaft bedeutet 'orange juice'.<br/>Orangensaft means 'orange juice'."
+                    },
+                    {
+                        topic: 'meals',
+                        question: "Was bedeutet 'der Saft' auf Englisch?",
+                        options: ["A) Saft", "B) Tee", "C) Kaffee"],
+                        correctAnswer: "A",
+                        explanation: "'der Saft' bedeutet 'juice'.<br/>'der Saft' means 'juice'."
+                    },
+                    {
+                        topic: 'meals',
+                        question: "Wie sagt man 'I like to drink coffee' auf Deutsch?",
+                        options: ["A) Ich mag Kaffee trinken", "B) Ich trinke gerne Kaffee", "C) Beide sind korrekt"],
+                        correctAnswer: "C",
+                        explanation: "Beide Satzstellungen sind korrekt.<br/>Both sentence structures are correct."
+                    },
+                    {
+                        topic: 'meals',
+                        question: "Was bedeutet 'die Marmelade' auf Englisch?",
+                        options: ["A) Butter", "B) Marmelade", "C) Müsli"],
+                        correctAnswer: "B",
+                        explanation: "'die Marmelade' bedeutet 'jam'.<br/>'die Marmelade' means 'jam'."
+                    },
+
+                    // Modal Verbs Questions (10 questions)
+                    {
+                        topic: 'modalVerbs',
+                        question: "Konjugiere 'müssen' für 'er/sie/es'.",
+                        options: ["A) muss", "B) musst", "C) müssen"],
+                        correctAnswer: "A",
+                        explanation: "Die richtige Form ist 'er/sie/es muss'.<br/>The correct form is 'er/sie/es muss'."
+                    },
+                    {
+                        topic: 'modalVerbs',
+                        question: "Welche Satzstellung ist korrekt?",
+                        options: ["A) Ich möchte ins Kino gehen", "B) Ich möchte gehen ins Kino", "C) Ich ins Kino möchte gehen"],
+                        correctAnswer: "A",
+                        explanation: "Bei Modalverben steht das Vollverb im Infinitiv am Satzende.<br/>With modal verbs, the main verb in infinitive is at the end of the sentence."
+                    },
+                    {
+                        topic: 'modalVerbs',
+                        question: "Was bedeutet 'Ich darf schwimmen' auf Englisch?",
+                        options: ["A) Ich muss schwimmen", "B) Ich kann schwimmen", "C) Ich will schwimmen"],
+                        correctAnswer: "B",
+                        explanation: "'Ich darf schwimmen' bedeutet 'I can swim' oder 'I am allowed to swim'.<br/>'Ich darf schwimmen' means 'I can swim' or 'I am allowed to swim'."
+                    },
+                    {
+                        topic: 'modalVerbs',
+                        question: "Konjugiere 'können' für 'wir'.",
+                        options: ["A) können", "B) könnt", "C) kann"],
+                        correctAnswer: "A",
+                        explanation: "Die richtige Form ist 'wir können'.<br/>The correct form is 'wir können'."
+                    },
+                    {
+                        topic: 'modalVerbs',
+                        question: "Was bedeutet 'Ich soll lernen' auf Englisch?",
+                        options: ["A) I should study", "B) I must study", "C) I can study"],
+                        correctAnswer: "A",
+                        explanation: "'Ich soll lernen' bedeutet 'I should study'.<br/>'Ich soll lernen' means 'I should study'."
+                    },
+                    {
+                        topic: 'modalVerbs',
+                        question: "Welches Modalverb drückt eine Absicht aus?",
+                        options: ["A) dürfen", "B) wollen", "C) müssen"],
+                        correctAnswer: "B",
+                        explanation: "'wollen' drückt eine Absicht aus.<br/>'wollen' expresses an intention."
+                    },
+                    {
+                        topic: 'modalVerbs',
+                        question: "Was bedeutet 'Wir dürfen hier nicht rauchen' auf Englisch?",
+                        options: ["A) Wir müssen hier nicht rauchen", "B) We are allowed to smoke here", "C) We cannot smoke here"],
+                        correctAnswer: "C",
+                        explanation: "'Wir dürfen hier nicht rauchen' bedeutet 'We cannot smoke here' oder 'We are not allowed to smoke here'.<br/>'Wir dürfen hier nicht rauchen' means 'We cannot smoke here' or 'We are not allowed to smoke here'."
+                    },
+                    {
+                        topic: 'modalVerbs',
+                        question: "Konjugiere 'sollen' für 'du'.",
+                        options: ["A) sollst", "B) soll", "C) sollen"],
+                        correctAnswer: "A",
+                        explanation: "Die richtige Form ist 'du sollst'.<br/>The correct form is 'du sollst'."
+                    },
+                    {
+                        topic: 'modalVerbs',
+                        question: "Was bedeutet 'Sie möchten reisen' auf Englisch?",
+                        options: ["A) They want to travel", "B) They must travel", "C) They can travel"],
+                        correctAnswer: "A",
+                        explanation: "'Sie möchten reisen' bedeutet 'They want to travel'.<br/>'Sie möchten reisen' means 'They want to travel'."
+                    },
+                    {
+                        topic: 'modalVerbs',
+                        question: "Welches Modalverb drückt eine Erlaubnis aus?",
+                        options: ["A) dürfen", "B) können", "C) wollen"],
+                        correctAnswer: "A",
+                        explanation: "'dürfen' drückt eine Erlaubnis aus.<br/>'dürfen' expresses permission."
+                    },
+                    {
+                        topic: 'modalVerbs',
+                        question: "Was bedeutet 'Ihr könnt hier bleiben' auf Englisch?",
+                        options: ["A) Ihr müsst hier bleiben", "B) Ihr könnt hier bleiben", "C) Ihr sollt hier bleiben"],
+                        correctAnswer: "B",
+                        explanation: "'Ihr könnt hier bleiben' bedeutet 'You can stay here'.<br/>'Ihr könnt hier bleiben' means 'You can stay here'."
+                    },
+
+                    // School Activities Questions (10 questions)
+                    {
+                        topic: 'school',
+                        question: "Was ist die 'Mal-AG' auf Englisch?",
+                        options: ["A) Schachclub", "B) Kunstclub", "C) Theatergruppe"],
+                        correctAnswer: "B",
+                        explanation: "'Mal-AG' bedeutet 'art club'.<br/>'Mal-AG' means 'art club'."
+                    },
+                    {
+                        topic: 'school',
+                        question: "Wie fragt man nach der Zeit einer AG?",
+                        options: ["A) Wann ist die AG?", "B) Wo ist die AG?", "C) Was ist die AG?"],
+                        correctAnswer: "A",
+                        explanation: "'Wann ist die AG?' fragt nach der Zeit.<br/>'Wann ist die AG?' asks for the time."
+                    },
+                    {
+                        topic: 'school',
+                        question: "Was bedeutet 'der Sportverein' auf Englisch?",
+                        options: ["A) Sports club", "B) Art club", "C) Music club"],
+                        correctAnswer: "A",
+                        explanation: "'der Sportverein' bedeutet 'sports club'.<br/>'der Sportverein' means 'sports club'."
+                    },
+                    {
+                        topic: 'school',
+                        question: "Wie sagt man 'I have homework' auf Deutsch?",
+                        options: ["A) Ich habe Hausaufgaben", "B) Ich mache Hausaufgaben", "C) Ich gehe zur Schule"],
+                        correctAnswer: "A",
+                        explanation: "'I have homework' ist 'Ich habe Hausaufgaben'.<br/>'I have homework' is 'Ich habe Hausaufgaben'."
+                    },
+                    {
+                        topic: 'school',
+                        question: "Was bedeutet 'der Schachclub' auf Englisch?",
+                        options: ["A) Chess club", "B) Science club", "C) Drama club"],
+                        correctAnswer: "A",
+                        explanation: "'der Schachclub' bedeutet 'chess club'.<br/>'der Schachclub' means 'chess club'."
+                    },
+                    {
+                        topic: 'school',
+                        question: "Was bedeutet 'die AG' auf Englisch?",
+                        options: ["A) Academic group", "B) Club/extracurricular activity", "C) Homework group"],
+                        correctAnswer: "B",
+                        explanation: "'die AG' bedeutet 'club/extracurricular activity'.<br/>'die AG' means 'club/extracurricular activity'."
+                    },
+                    {
+                        topic: 'school',
+                        question: "Wie sagt man 'I want to join the theater group' auf Deutsch?",
+                        options: ["A) Ich möchte der Theater-AG beitreten", "B) Ich will zur Theater-AG gehen", "C) Beide sind korrekt"],
+                        correctAnswer: "C",
+                        explanation: "Beide Satzstellungen sind korrekt.<br/>Both sentence structures are correct."
+                    },
+                    {
+                        topic: 'school',
+                        question: "Was bedeutet 'die Hausaufgaben' auf Englisch?",
+                        options: ["A) Classroom assignments", "B) Homework", "C) Club activities"],
+                        correctAnswer: "B",
+                        explanation: "'die Hausaufgaben' bedeutet 'homework'.<br/>'die Hausaufgaben' means 'homework'."
+                    },
+                    {
+                        topic: 'school',
+                        question: "Wie fragt man nach dem Unterrichtsstoff?",
+                        options: ["A) Was ist die AG?", "B) Was ist der Unterrichtsstoff?", "C) Wann ist die Schule?"],
+                        correctAnswer: "B",
+                        explanation: "'Was ist der Unterrichtsstoff?' fragt nach dem Thema des Unterrichts.<br/>'Was ist der Unterrichtsstoff?' asks about the lesson topic."
+                    },
+                    {
+                        topic: 'school',
+                        question: "Was bedeutet 'ganztägig' auf Englisch?",
+                        options: ["A) Part-time", "B) All-day", "C) Morning"],
+                        correctAnswer: "B",
+                        explanation: "'ganztägig' bedeutet 'all-day'.<br/>'ganztägig' means 'all-day'."
+                    },
+
+                    // Dialogues Questions (10 questions)
+                    {
+                        topic: 'dialogues',
+                        question: "Wie antwortest du höflich auf eine Einladung, die du ablehnen musst?",
+                        options: ["A) Nein", "B) Ich kann nicht, tut mir leid", "C) Vielleicht"],
+                        correctAnswer: "B",
+                        explanation: "'Ich kann nicht, tut mir leid' ist eine höfliche Ablehnung.<br/>'I can't, sorry' is a polite decline."
+                    },
+                    {
+                        topic: 'dialogues',
+                        question: "Welche Höflichkeitsform verwendet man für Lehrer?",
+                        options: ["A) Du", "B) Ihr", "C) Sie"],
+                        correctAnswer: "C",
+                        explanation: "Man verwendet 'Sie' als Höflichkeitsform.<br/>You use 'Sie' as the polite form."
+                    },
+                    {
+                        topic: 'dialogues',
+                        question: "Was bedeutet 'Hast du Zeit?' auf Englisch?",
+                        options: ["A) Do you have time?", "B) Are you busy?", "C) Do you like it?"],
+                        correctAnswer: "A",
+                        explanation: "'Hast du Zeit?' bedeutet 'Do you have time?'.<br/>'Hast du Zeit?' means 'Do you have time?'."
+                    },
+                    {
+                        topic: 'dialogues',
+                        question: "Wie sagt man 'See you later!' auf Deutsch?",
+                        options: ["A) Bis bald!", "B) Guten Morgen!", "C) Auf Wiedersehen!"],
+                        correctAnswer: "A",
+                        explanation: "'Bis bald!' bedeutet 'See you later!'.<br/>'Bis bald!' means 'See you later!'."
+                    },
+                    {
+                        topic: 'dialogues',
+                        question: "Was bedeutet 'Ich habe Hunger' auf Englisch?",
+                        options: ["A) I am thirsty", "B) I am hungry", "C) I am tired"],
+                        correctAnswer: "B",
+                        explanation: "'Ich habe Hunger' bedeutet 'I am hungry'.<br/>'Ich habe Hunger' means 'I am hungry'."
+                    },
+                    {
+                        topic: 'dialogues',
+                        question: "Wie fragt man jemanden nach seinem Wohlbefinden?",
+                        options: ["A) Wie geht es dir?", "B) Wo bist du?", "C) Was machst du?"],
+                        correctAnswer: "A",
+                        explanation: "'Wie geht es dir?' fragt nach dem Wohlbefinden.<br/>'Wie geht es dir?' asks about well-being."
+                    },
+                    {
+                        topic: 'dialogues',
+                        question: "Was bedeutet 'Kannst du mir helfen?' auf Englisch?",
+                        options: ["A) Can you help me?", "B) Do you like me?", "C) Will you come with me?"],
+                        correctAnswer: "A",
+                        explanation: "'Kannst du mir helfen?' bedeutet 'Can you help me?'.<br/>'Kannst du mir helfen?' means 'Can you help me?'."
+                    },
+                    {
+                        topic: 'dialogues',
+                        question: "Wie sagt man 'I don't understand' auf Deutsch?",
+                        options: ["A) Ich verstehe nicht", "B) Ich weiß nicht", "C) Ich höre nicht"],
+                        correctAnswer: "A",
+                        explanation: "'Ich verstehe nicht' bedeutet 'I don't understand'.<br/>'Ich verstehe nicht' means 'I don't understand'."
+                    },
+                    {
+                        topic: 'dialogues',
+                        question: "Was bedeutet 'Guten Morgen' auf Englisch?",
+                        options: ["A) Good night", "B) Good evening", "C) Good morning"],
+                        correctAnswer: "C",
+                        explanation: "'Guten Morgen' bedeutet 'Good morning'.<br/>'Guten Morgen' means 'Good morning'."
+                    },
+                    {
+                        topic: 'dialogues',
+                        question: "Wie fragt man jemanden, ob er Zeit hat?",
+                        options: ["A) Hast du Zeit?", "B) Wo bist du?", "C) Was machst du?"],
+                        correctAnswer: "A",
+                        explanation: "'Hast du Zeit?' fragt, ob jemand Zeit hat.<br/>'Hast du Zeit?' asks if someone has time."
+                    },
+                ];
+
+                const userAnswers = Array(questions.length).fill(null);
+                const showExplanations = Array(questions.length).fill(false);
+
+                this.state = {
+                    questions: questions,
+                    userAnswers: userAnswers,
+                    showExplanations: showExplanations,
+                    showFeedback: false
+                };
+            }
+
+            handleAnswer = (index, answer) => {
+                let userAnswers = [...this.state.userAnswers];
+                userAnswers[index] = answer;
+                this.setState({ userAnswers }, () => {
+                    // Check if all questions have been answered
+                    if (this.state.userAnswers.every(ans => ans !== null)) {
+                        this.setState({ showFeedback: true });
+                    }
+                });
+            }
+
+            toggleExplanation = (index) => {
+                let showExplanations = [...this.state.showExplanations];
+                showExplanations[index] = !showExplanations[index];
+                this.setState({ showExplanations });
+            }
+
+            calculateScore = () => {
+                const { questions, userAnswers } = this.state;
+                let totalCorrect = 0;
+                let topicScores = {};
+
+                questions.forEach((q, idx) => {
+                    if (userAnswers[idx] === q.correctAnswer) {
+                        totalCorrect += 1;
+                        topicScores[q.topic] = (topicScores[q.topic] || 0) + 1;
+                    }
+                });
+
+                return { totalCorrect, topicScores };
+            }
+
+            renderFeedback = () => {
+                const { totalCorrect, topicScores } = this.calculateScore();
+                const totalQuestions = this.state.questions.length;
+                const percentage = ((totalCorrect / totalQuestions) * 100).toFixed(2);
+
+                // Calculate per-topic total
+                let topics = {};
+                this.state.questions.forEach(q => {
+                    topics[q.topic] = (topics[q.topic] || 0) + 1;
+                });
+
+                return (
+                    <div className="feedback">
+                        <h3>Feedback</h3>
+                        <p>Du hast <strong>{totalCorrect}</strong> von <strong>{totalQuestions}</strong> Fragen richtig beantwortet.</p>
+                        <p>Das entspricht <strong>{percentage}%</strong>.</p>
+                        <h4>Detailierte Ergebnisse pro Thema:</h4>
+                        <ul>
+                            {Object.keys(topicScores).map(topic => (
+                                <li key={topic}>
+                                    <strong>{capitalizeFirstLetter(topic)}:</strong> {topicScores[topic]} von {topics[topic]} richtig
+                                </li>
+                            ))}
+                        </ul>
+                        <h4>Verbessere dich:</h4>
+                        <ul>
+                            {Object.keys(topicScores).map(topic => {
+                                const correct = topicScores[topic];
+                                const total = topics[topic];
+                                const score = (correct / total) * 100;
+                                if (score < 70) {
+                                    return (
+                                        <li key={topic}>
+                                            {capitalizeFirstLetter(topic)}: Du könntest in diesem Bereich noch mehr üben.
+                                        </li>
+                                    );
+                                }
+                                return null;
+                            })}
+                        </ul>
+                    </div>
+                );
+            }
+
+            render() {
+                return (
+                    <div className="tab-content">
+                        <h2>Wissensüberprüfung<br />Knowledge Test</h2>
+                        {this.state.questions.length === 0 ? (
+                            <p>Lade Fragen...</p>
+                        ) : (
+                            <div>
+                                {this.state.questions.map((q, index) => (
+                                    <div key={index} className="question">
+                                        <p><strong>Frage {index + 1}:</strong> {q.question}</p>
+                                        {q.options.map((option, optionIndex) => (
+                                            <button
+                                                key={optionIndex}
+                                                onClick={() => this.handleAnswer(index, option[0])}
+                                                style={{
+                                                    backgroundColor: this.state.userAnswers[index] === option[0] ? '#007bff' : '#28a745'
+                                                }}
+                                                disabled={this.state.userAnswers[index] !== null}
+                                            >
+                                                {option}
+                                            </button>
+                                        ))}
+                                        {this.state.userAnswers[index] && (
+                                            <div>
+                                                <p>
+                                                    <strong>Ihre Antwort:</strong> {this.state.userAnswers[index]}<br />
+                                                    <strong>Ihre Antwort:</strong> {this.state.userAnswers[index]}
+                                                </p>
+                                                <p>
+                                                    <strong>Richtige Antwort:</strong> {q.correctAnswer}<br />
+                                                    <strong>Correct answer:</strong> {q.correctAnswer}
+                                                </p>
+                                                <button onClick={() => this.toggleExplanation(index)}>
+                                                    {this.state.showExplanations[index] ? "Erklärung verbergen" : "Erklärung anzeigen"}
+                                                    <br />
+                                                    {this.state.showExplanations[index] ? "Hide Explanation" : "Show Explanation"}
+                                                </button>
+                                                {this.state.showExplanations[index] && (
+                                                    <div className="explanation">
+                                                        <p dangerouslySetInnerHTML={{ __html: q.explanation }} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+
+                                {this.state.showFeedback && this.renderFeedback()}
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+        }
+
+        // Helper function to capitalize the first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
